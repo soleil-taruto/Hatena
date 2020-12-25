@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D2EB218B-F624-4F86-BC32-02D9BAF3FFAC}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Charlotte</RootNamespace>
+    <AssemblyName>Claes20200001</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common.cs" />
+    <Compile Include="Commons\ArgsReader.cs" />
+    <Compile Include="Commons\AttachString.cs" />
+    <Compile Include="Commons\D2Point.cs" />
+    <Compile Include="Commons\D2Size.cs" />
+    <Compile Include="Commons\D3Color.cs" />
+    <Compile Include="Commons\D4Color.cs" />
+    <Compile Include="Commons\D4Rect.cs" />
+    <Compile Include="Commons\I2Point.cs" />
+    <Compile Include="Commons\I2Size.cs" />
+    <Compile Include="Commons\I3Color.cs" />
+    <Compile Include="Commons\I4Color.cs" />
+    <Compile Include="Commons\I4Rect.cs" />
+    <Compile Include="Commons\P4Poly.cs" />
+    <Compile Include="Commons\ProcMain.cs" />
+    <Compile Include="Commons\RandomUnit.cs" />
+    <Compile Include="Commons\SCommon.cs" />
+    <Compile Include="Commons\WorkingDir.cs" />
+    <Compile Include="Consts.cs" />
+    <Compile Include="CSSolutions\CSConsts.cs" />
+    <Compile Include="CSSolutions\CSProjectFile.cs" />
+    <Compile Include="CSSolutions\CSRenameVarsFilter.cs" />
+    <Compile Include="CSSolutions\CSSolution.cs" />
+    <Compile Include="CSSolutions\CSFile.cs" />
+    <Compile Include="CSSolutions\CSResources.cs" />
+    <Compile Include="ElsaConfuser.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\CheckRemovableCSWordsTest.cs" />
+    <Compile Include="Tests\DummyMemberSamples\ClassDummyMemberSample.cs" />
+    <Compile Include="Tests\Test0001.cs" />
+    <Compile Include="Tests\DummyMemberSamples\StructDummyMemberSample.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
