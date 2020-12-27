@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{BFFA4327-88D3-4762-B7C9-BD7751F2A5C4}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Charlotte</RootNamespace>
+    <AssemblyName>Elsa20200001</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Elsa20200001.ico</ApplicationIcon>
+    <StartupObject>Charlotte.ResizeCustomAstatineProtocol</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DxLibDotNet">
+      <HintPath>..\..\1\Confused_03\tmpsol\Elsa20200001\bin\Release\DxLibDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AcceptAutomaticEuropaCommand.cs" />
+    <Compile Include="AdjustVerboseDiamondConstant.cs" />
+    <Compile Include="AgreeUnknownMetisFunction.cs" />
+    <Compile Include="AppendDeprecatedCoperniciumNode.cs" />
+    <Compile Include="AssertExtraSunIncrement.cs" />
+    <Compile Include="AssignCorrectKallichoreSignature.cs" />
+    <Compile Include="AvoidFalseTethysSpace.cs" />
+    <Compile Include="BindAvailablePandiaRange.cs" />
+    <Compile Include="BlockUnauthorizedMendeleviumFeature.cs" />
+    <Compile Include="BrowseBasedIronControl.cs" />
+    <Compile Include="BuildPublicNihoniumHealth.cs" />
+    <Compile Include="BumpExistingEnceladusComponent.cs" />
+    <Compile Include="BundleAbstractCordeliaConstraint.cs" />
+    <Compile Include="CalculateLatestAoedeTransaction.cs" />
+    <Compile Include="CallConstantOxygenInstaller.cs" />
+    <Compile Include="CallUniqueThemistoFile.cs" />
+    <Compile Include="CaptureUnusedArielVersion.cs" />
+    <Compile Include="CastExistingAoedeTransition.cs" />
+    <Compile Include="CastInitialTantalumSignature.cs" />
+    <Compile Include="CastSuccessfulSulfurOwner.cs" />
+    <Compile Include="ClearPreviousChlorineSocket.cs" />
+    <Compile Include="CloneAnonymousHaumeaSpace.cs" />
+    <Compile Include="CloneVerboseMagicalTable.cs" />
+    <Compile Include="ClosePhysicalMeitneriumColumn.cs" />
+    <Compile Include="CloseRemoteSodiumAccess.cs" />
+    <Compile Include="CommitGlobalEireneArea.cs" />
+    <Compile Include="CompileTemporaryCeriumDescription.cs" />
+    <Compile Include="CompressNativePromethiumDisplay.cs" />
+    <Compile Include="ComputeExpressDesdemonaEntry.cs" />
+    <Compile Include="ConfigureDedicatedPerditaItem.cs" />
+    <Compile Include="ConfigureInnerRheniumTab.cs" />
+    <Compile Include="ConfigureOptionalEuantheCase.cs" />
+    <Compile Include="ConfirmCleanCupidSuffix.cs" />
+    <Compile Include="ConflictUnableBerryStream.cs" />
+    <Compile Include="ConstructInvalidUranusWindow.cs" />
+    <Compile Include="ContactNestedErbiumCursor.cs" />
+    <Compile Include="ContainDynamicAmericiumAssignment.cs" />
+    <Compile Include="ContainNextPhilophrosyneSyntax.cs" />
+    <Compile Include="ControlSpecificHydrogenNone.cs" />
+    <Compile Include="ConvertBlankCallirrhoeCredential.cs" />
+    <Compile Include="CopyMissingEireneGroup.cs" />
+    <Compile Include="CorrectNativeHydrogenLayout.cs" />
+    <Compile Include="CorrectUnableHelikePriority.cs" />
+    <Compile Include="CountMultipleRutheniumBug.cs" />
+    <Compile Include="CreateNextIsonoeMaster.cs" />
+    <Compile Include="CreateNumericRadonExpression.cs" />
+    <Compile Include="CustomizeDedicatedMegacliteBundle.cs" />
+    <Compile Include="DebugMultipleIodineWidth.cs" />
+    <Compile Include="DeclareExpressCobaltDevice.cs" />
+    <Compile Include="DecodeIncompatibleMolybdenumBracket.cs" />
+    <Compile Include="DefineCorePhosphorusDependency.cs" />
+    <Compile Include="DeleteCorrectSummerWarning.cs" />
+    <Compile Include="DeleteGlobalJupiterAlias.cs" />
+    <Compile Include="DeployDuplicateHyperionAction.cs" />
+    <Compile Include="DestroyInitialBerylliumThirdparty.cs" />
+    <Compile Include="DetectDynamicSeaborgiumExecutable.cs" />
+    <Compile Include="DetermineCustomRhodiumNone.cs" />
+    <Compile Include="DistributeInternalStarCore.cs" />
+    <Compile Include="DocumentInvalidKaleScreen.cs" />
+    <Compile Include="DuplicateMissingJarnsaxaClipboard.cs" />
+    <Compile Include="DuplicateNormalNarviPrefix.cs" />
+    <Compile Include="EncodeAdditionalManganeseBundle.cs" />
+    <Compile Include="EncounterUnusedAntimonyInteger.cs" />
+    <Compile Include="EnterMaximumSparkleAvailability.cs" />
+    <Compile Include="EqualUnknownFermiumInformation.cs" />
+    <Compile Include="EscapeDedicatedMabNull.cs" />
+    <Compile Include="ExistCompleteIjiraqTemplate.cs" />
+    <Compile Include="ExistCoreEarthPadding.cs" />
+    <Compile Include="ExitLatestProsperoUse.cs" />
+    <Compile Include="ExitUnknownPapayaActivity.cs" />
+    <Compile Include="ExpandInlineActiniumBody.cs" />
+    <Compile Include="ExpandUnauthorizedCressidaConsole.cs" />
+    <Compile Include="ExpressUnavailableStephanoContact.cs" />
+    <Compile Include="ExtendMissingIndiumInstallation.cs" />
+    <Compile Include="FailManualKalykeMap.cs" />
+    <Compile Include="FilterExistingDioneSetup.cs" />
+    <Compile Include="FirePreferredCustardEnvironment.cs" />
+    <Compile Include="FollowPublicMendeleviumUsername.cs" />
+    <Compile Include="HackDecimalScandiumTransaction.cs" />
+    <Compile Include="HackUnavailableDioneHandle.cs" />
+    <Compile Include="HackUniqueAtlasForm.cs" />
+    <Compile Include="IgnoreFalseFloraLine.cs" />
+    <Compile Include="ImportPreviousCalciumReport.cs" />
+    <Compile Include="IndicateDynamicDesdemonaVariable.cs" />
+    <Compile Include="InitializeMissingYellSocket.cs" />
+    <Compile Include="InitializeRawPrincessBody.cs" />
+    <Compile Include="InspectCorePapayaDescription.cs" />
+    <Compile Include="InstallConstantMelodyProfile.cs" />
+    <Compile Include="InstallPreviousOberonCheckout.cs" />
+    <Compile Include="InteractGlobalLysitheaSnapshot.cs" />
+    <Compile Include="IterateGeneralThalliumNotification.cs" />
+    <Compile Include="LabelGeneralTethysBug.cs" />
+    <Compile Include="LimitDynamicEarlSeparator.cs" />
+    <Compile Include="LogAvailableGreipHandling.cs" />
+    <Compile Include="LogExternalTwinkleNavigation.cs" />
+    <Compile Include="MakeVerboseParfaitMenu.cs" />
+    <Compile Include="ManageTrueCadmiumCursor.cs" />
+    <Compile Include="MapRawLarissaIndex.cs" />
+    <Compile Include="MergeCompleteHelikeServer.cs" />
+    <Compile Include="ModifyEqualRadonBatch.cs" />
+    <Compile Include="ModifyMockMercuryException.cs" />
+    <Compile Include="MoveConditionalKaleOwner.cs" />
+    <Compile Include="NotifyAccessibleNileCleanup.cs" />
+    <Compile Include="NotifyPreferredDesdemonaType.cs" />
+    <Compile Include="OccurActiveZincDevelopment.cs" />
+    <Compile Include="OccurOptionalPlutoniumIcon.cs" />
+    <Compile Include="OpenUniqueThebeLookup.cs" />
+    <Compile Include="OutputManualAutonoeParent.cs" />
+    <Compile Include="OverwriteTemporaryAquaArchive.cs" />
+    <Compile Include="PassTemporaryElaraSnapshot.cs" />
+    <Compile Include="PerformGeneralWindyModification.cs" />
+    <Compile Include="PerformPreferredEchoDashboard.cs" />
+    <Compile Include="PostCoreMiracleAudio.cs" />
+    <Compile Include="ProcessDedicatedIronExecution.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <DependentUpon>Settings.settings</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ProvideConstantPhosphorusTask.cs" />
+    <Compile Include="ProvideMinimumMirandaBoot.cs" />
+    <Compile Include="PushValidKryptonElement.cs" />
+    <Compile Include="RefactorCustomJupiterCompletion.cs" />
+    <Compile Include="RefactorUnexpectedBlackModule.cs" />
+    <Compile Include="ReferGenericHatiDebugger.cs" />
+    <Compile Include="ReferManualSherryVisibility.cs" />
+    <Compile Include="RegisterSecureRhythmFallback.cs" />
+    <Compile Include="RemoveMockSparkleDisk.cs" />
+    <Compile Include="RepresentStandaloneSkathiClass.cs" />
+    <Compile Include="RequireRawTitaniaInspection.cs" />
+    <Compile Include="ReserveDuplicateEurydomeLog.cs" />
+    <Compile Include="ResetAccessibleDiamondManager.cs" />
+    <Compile Include="ResetCoreSeleneFailure.cs" />
+    <Compile Include="ResetCorrectDeimosModule.cs" />
+    <Compile Include="ResetGenericLarissaPlaceholder.cs" />
+    <Compile Include="ResizeCustomAstatineProtocol.cs" />
+    <Compile Include="ResizeCustomTinVisibility.cs" />
+    <Compile Include="RespondManualThrymrValidation.cs" />
+    <Compile Include="RestoreCustomSuttungrArchive.cs" />
+    <Compile Include="RevertExpressZincDebugger.cs" />
+    <Compile Include="RevertSpecificPalladiumMillisecond.cs" />
+    <Compile Include="ScaleCleanJulietReference.cs" />
+    <Compile Include="ScaleGeneralKiviuqCompatibility.cs" />
+    <Compile Include="ScheduleConditionalFortuneResolution.cs" />
+    <Compile Include="SelectFalseDiamondScope.cs" />
+    <Compile Include="SendGlobalDysprosiumFormat.cs" />
+    <Compile Include="SendOpenProsperoManager.cs" />
+    <Compile Include="SetAbstractIsonoeModel.cs" />
+    <Compile Include="SkipExecutablePasiphaeMetadata.cs" />
+    <Compile Include="SplitDeprecatedMimasRoot.cs" />
+    <Compile Include="SplitExpectedDiaMaster.cs" />
+    <Compile Include="SplitFreeGalliumIssue.cs" />
+    <Compile Include="SplitStaticHaumeaHandle.cs" />
+    <Compile Include="StartUsefulNickelPriority.cs" />
+    <Compile Include="SwitchCoreAluminiumType.cs" />
+    <Compile Include="TerminateVerboseCeresExpression.cs" />
+    <Compile Include="TestMultipleCallistoObject.cs" />
+    <Compile Include="ThrowExpectedMacaronLogic.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ThrowExpectedMacaronLogic.Designer.cs">
+      <DependentUpon>ThrowExpectedMacaronLogic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ThrowPublicMetisMedia.cs" />
+    <Compile Include="TouchInlineCaesiumProperty.cs" />
+    <Compile Include="TweakIncompatibleCeresCopyright.cs" />
+    <Compile Include="TweakNativeCallistoStack.cs" />
+    <Compile Include="TweakSpecificJarnsaxaThread.cs" />
+    <Compile Include="TypeVisibleMegacliteHighlight.cs" />
+    <Compile Include="UndoManualHassiumBrace.cs" />
+    <Compile Include="UninstallDedicatedHelikeAnnotation.cs" />
+    <Compile Include="UninstallExpressGalliumDevelopment.cs" />
+    <Compile Include="UpdateSecureRougeBackup.cs" />
+    <Compile Include="UpgradeNormalEpimetheusEditor.cs" />
+    <Compile Include="UploadUnableMercuryRequest.cs" />
+    <Compile Include="UploadUnresolvedBromineWrapper.cs" />
+    <Compile Include="VerifyBooleanIapetusParent.cs" />
+    <Compile Include="VerifyRemoteEarthWindow.cs" />
+    <Compile Include="WarnInlineSunsetState.cs" />
+    <Compile Include="WarnMockPhoebeEnvironment.cs" />
+    <Compile Include="WriteOpenProteusMetadata.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resources" />
+    <EmbeddedResource Include="ThrowExpectedMacaronLogic.resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

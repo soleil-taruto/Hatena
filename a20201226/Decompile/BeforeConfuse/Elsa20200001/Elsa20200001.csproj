@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{595042D6-D4CF-4C18-AC72-BACD05A70B28}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Charlotte</RootNamespace>
+    <AssemblyName>Elsa20200001</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Elsa20200001.ico</ApplicationIcon>
+    <StartupObject>Charlotte.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DxLibDotNet">
+      <HintPath>..\..\1\BeforeConfuse\Elsa20200001\bin\Release\DxLibDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common.cs" />
+    <Compile Include="Commons\ArgsReader.cs" />
+    <Compile Include="Commons\AttachString.cs" />
+    <Compile Include="Commons\D2Point.cs" />
+    <Compile Include="Commons\D2Size.cs" />
+    <Compile Include="Commons\D3Color.cs" />
+    <Compile Include="Commons\D4Color.cs" />
+    <Compile Include="Commons\D4Rect.cs" />
+    <Compile Include="Commons\I2Point.cs" />
+    <Compile Include="Commons\I2Size.cs" />
+    <Compile Include="Commons\I3Color.cs" />
+    <Compile Include="Commons\I4Color.cs" />
+    <Compile Include="Commons\I4Rect.cs" />
+    <Compile Include="Commons\P4Poly.cs" />
+    <Compile Include="Commons\ProcMain.cs" />
+    <Compile Include="Commons\RandomUnit.cs" />
+    <Compile Include="Commons\SCommon.cs" />
+    <Compile Include="Commons\WorkingDir.cs" />
+    <Compile Include="Consts.cs" />
+    <Compile Include="GameCommons\DDCoffeeBreak.cs" />
+    <Compile Include="GameCommons\DDConfig.cs" />
+    <Compile Include="GameCommons\DDConsts.cs" />
+    <Compile Include="GameCommons\DDCurtain.cs" />
+    <Compile Include="GameCommons\DDDatStrings.cs" />
+    <Compile Include="GameCommons\DDDerivations.cs" />
+    <Compile Include="GameCommons\DDDerivationUtils.cs" />
+    <Compile Include="GameCommons\DDDraw.cs" />
+    <Compile Include="GameCommons\DDEngine.cs" />
+    <Compile Include="GameCommons\DDError.cs" />
+    <Compile Include="GameCommons\DDFont.cs" />
+    <Compile Include="GameCommons\DDFontRegister.cs" />
+    <Compile Include="GameCommons\DDFontUtils.cs" />
+    <Compile Include="GameCommons\DDGeneralResource.cs" />
+    <Compile Include="GameCommons\DDGround.cs" />
+    <Compile Include="GameCommons\DDInput.cs" />
+    <Compile Include="GameCommons\DDJammer.cs" />
+    <Compile Include="GameCommons\DDKey.cs" />
+    <Compile Include="GameCommons\DDList.cs" />
+    <Compile Include="GameCommons\DDMain.cs" />
+    <Compile Include="GameCommons\DDMain2.cs" />
+    <Compile Include="GameCommons\DDMouse.cs" />
+    <Compile Include="GameCommons\DDMusic.cs" />
+    <Compile Include="GameCommons\DDMusicUtils.cs" />
+    <Compile Include="GameCommons\DDPad.cs" />
+    <Compile Include="GameCommons\DDPicture.cs" />
+    <Compile Include="GameCommons\DDPictureLoaders.cs" />
+    <Compile Include="GameCommons\DDPictureLoaders2.cs" />
+    <Compile Include="GameCommons\DDPictureLoaderUtils.cs" />
+    <Compile Include="GameCommons\DDPictureUtils.cs" />
+    <Compile Include="GameCommons\DDPrint.cs" />
+    <Compile Include="GameCommons\DDRandom.cs" />
+    <Compile Include="GameCommons\DDResource.cs" />
+    <Compile Include="GameCommons\DDSaveData.cs" />
+    <Compile Include="GameCommons\DDScene.cs" />
+    <Compile Include="GameCommons\DDSceneUtils.cs" />
+    <Compile Include="GameCommons\DDSE.cs" />
+    <Compile Include="GameCommons\DDSEUtils.cs" />
+    <Compile Include="GameCommons\DDSimpleMenu.cs" />
+    <Compile Include="GameCommons\DDSound.cs" />
+    <Compile Include="GameCommons\DDSoundUtils.cs" />
+    <Compile Include="GameCommons\DDSubScreen.cs" />
+    <Compile Include="GameCommons\DDSubScreenUtils.cs" />
+    <Compile Include="GameCommons\DDSystem.cs" />
+    <Compile Include="GameCommons\DDTable.cs" />
+    <Compile Include="GameCommons\DDTask.cs" />
+    <Compile Include="GameCommons\DDTaskList.cs" />
+    <Compile Include="GameCommons\DDUserDatStrings.cs" />
+    <Compile Include="GameCommons\DDUtils.cs" />
+    <Compile Include="GameCommons\DDWin32.cs" />
+    <Compile Include="GameCommons\MaskGZDataUtils\MaskGZDataEng.cs" />
+    <Compile Include="GameCommons\Options\DDCCResource.cs" />
+    <Compile Include="GameCommons\Options\DDCrash.cs" />
+    <Compile Include="GameCommons\Options\DDCrashUtils.cs" />
+    <Compile Include="GameCommons\Options\DDCrashView.cs" />
+    <Compile Include="GameCommons\Options\DDSceneKeeper.cs" />
+    <Compile Include="GameCommons\Options\DDSlideUtils.cs" />
+    <Compile Include="Games\Effects.cs" />
+    <Compile Include="Games\Enemies\Enemy.cs" />
+    <Compile Include="Games\Enemies\EnemyCommon.cs" />
+    <Compile Include="Games\Enemies\Enemy_0001.cs" />
+    <Compile Include="Games\Enemies\Enemy_0001B.cs" />
+    <Compile Include="Games\Enemies\Enemy_0002.cs" />
+    <Compile Include="Games\Enemies\Enemy_0003.cs" />
+    <Compile Include="Games\Enemies\Enemy_BigJackOLantern.cs" />
+    <Compile Include="Games\Enemies\Enemy_Item.cs" />
+    <Compile Include="Games\Enemies\Enemy_JackOLantern.cs" />
+    <Compile Include="Games\Enemies\Enemy_JackOLantern_02.cs" />
+    <Compile Include="Games\Enemies\Enemy_Tama_01.cs" />
+    <Compile Include="Games\Enemies\Hinas\EnemyCommon_Hina.cs" />
+    <Compile Include="Games\Enemies\Hinas\Enemy_Hina.cs" />
+    <Compile Include="Games\Enemies\Hinas\Enemy_Hina_01.cs" />
+    <Compile Include="Games\Enemies\Hinas\Enemy_Hina_02.cs" />
+    <Compile Include="Games\Enemies\Hinas\Enemy_Hina_Tama_01.cs" />
+    <Compile Include="Games\Enemies\Hinas\Enemy_Hina_Tama_02.cs" />
+    <Compile Include="Games\Enemies\Hinas\Enemy_Hina_Tama_03.cs" />
+    <Compile Include="Games\Enemies\Rumias\EnemyCommon_Rumia.cs" />
+    <Compile Include="Games\Enemies\Rumias\EnemyConsts_Rumia.cs" />
+    <Compile Include="Games\Enemies\Rumias\Enemy_Rumia.cs" />
+    <Compile Include="Games\Enemies\Rumias\Enemy_Rumia_01.cs" />
+    <Compile Include="Games\Enemies\Rumias\Enemy_Rumia_02_04.cs" />
+    <Compile Include="Games\Enemies\Rumias\Enemy_Rumia_03.cs" />
+    <Compile Include="Games\Enemies\Rumias\Enemy_Rumia_Tama_03.cs" />
+    <Compile Include="Games\FieldDivider.cs" />
+    <Compile Include="Games\FieldDividerEffect.cs" />
+    <Compile Include="Games\Game.cs" />
+    <Compile Include="Games\GameCommon.cs" />
+    <Compile Include="Games\GameConsts.cs" />
+    <Compile Include="Games\GameMaster.cs" />
+    <Compile Include="Games\GameStatus.cs" />
+    <Compile Include="Games\Logo.cs" />
+    <Compile Include="Games\Player.cs" />
+    <Compile Include="Games\RippleEffect.cs" />
+    <Compile Include="Games\Scenario.cs" />
+    <Compile Include="Games\ScenarioCommand.cs" />
+    <Compile Include="Games\Scripts\Script.cs" />
+    <Compile Include="Games\Scripts\ScriptCommon.cs" />
+    <Compile Include="Games\Scripts\Script_Dummy0001.cs" />
+    <Compile Include="Games\Scripts\Script_HinaTest0001.cs" />
+    <Compile Include="Games\Scripts\Script_HinaTest0002.cs" />
+    <Compile Include="Games\Scripts\Script_HinaTest1001.cs" />
+    <Compile Include="Games\Scripts\Script_RumiaTest_0001.cs" />
+    <Compile Include="Games\Scripts\Script_RumiaTest_0001_Koakuma.cs" />
+    <Compile Include="Games\Scripts\Script_RumiaTest_0002.cs" />
+    <Compile Include="Games\Scripts\Script_RumiaTest_0003.cs" />
+    <Compile Include="Games\Scripts\Script_RumiaTest_0004.cs" />
+    <Compile Include="Games\Scripts\Script_Stage_01.cs" />
+    <Compile Include="Games\Scripts\Script_Stage_02.cs" />
+    <Compile Include="Games\Scripts\Script_Test0001.cs" />
+    <Compile Include="Games\Scripts\Script_Test0002.cs" />
+    <Compile Include="Games\Scripts\Script_Test1001.cs" />
+    <Compile Include="Games\Scripts\Script_Test2001.cs" />
+    <Compile Include="Games\Shots\Shot.cs" />
+    <Compile Include="Games\Shots\ShotConsts.cs" />
+    <Compile Include="Games\Shots\Shot_Bomb.cs" />
+    <Compile Include="Games\Shots\Shot_BossBomb.cs" />
+    <Compile Include="Games\Shots\Shot_Homing.cs" />
+    <Compile Include="Games\Shots\Shot_Laser.cs" />
+    <Compile Include="Games\Shots\Shot_MedicineBomb.cs" />
+    <Compile Include="Games\Shots\Shot_MedicineLaser.cs" />
+    <Compile Include="Games\Shots\Shot_Normal.cs" />
+    <Compile Include="Games\Shots\Shot_Strong.cs" />
+    <Compile Include="Games\Shots\Shot_Wave.cs" />
+    <Compile Include="Games\Shots\Shot_WaveBehind.cs" />
+    <Compile Include="Games\Surfaces\Surface.cs" />
+    <Compile Include="Games\Surfaces\SurfaceCreator.cs" />
+    <Compile Include="Games\Surfaces\SurfaceManager.cs" />
+    <Compile Include="Games\Surfaces\Surface_Chara.cs" />
+    <Compile Include="Games\Surfaces\Surface_MessageWindow.cs" />
+    <Compile Include="Games\TitleMenu.cs" />
+    <Compile Include="Games\Walls\Wall.cs" />
+    <Compile Include="Games\Walls\WallCommon.cs" />
+    <Compile Include="Games\Walls\WallConsts.cs" />
+    <Compile Include="Games\Walls\Wall_B11001.cs" />
+    <Compile Include="Games\Walls\Wall_B11002.cs" />
+    <Compile Include="Games\Walls\Wall_B12001.cs" />
+    <Compile Include="Games\Walls\Wall_B13001.cs" />
+    <Compile Include="Games\Walls\Wall_B21001.cs" />
+    <Compile Include="Games\Walls\Wall_B21002.cs" />
+    <Compile Include="Games\Walls\Wall_B22001.cs" />
+    <Compile Include="Games\Walls\Wall_Dark.cs" />
+    <Compile Include="Ground.cs" />
+    <Compile Include="MainWin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainWin.Designer.cs">
+      <DependentUpon>MainWin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Program2.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <DependentUpon>Settings.settings</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ResourceMusic.cs" />
+    <Compile Include="ResourcePicture.cs" />
+    <Compile Include="ResourcePicture2.cs" />
+    <Compile Include="ResourceSE.cs" />
+    <Compile Include="Tests\Games\GameTest.cs" />
+    <Compile Include="Tests\Games\TitleMenuTest.cs" />
+    <Compile Include="Tests\Test0001.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MainWin.resources" />
+    <EmbeddedResource Include="Properties\Resources.resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
