@@ -7,6 +7,8 @@ using Charlotte.GameCommons;
 
 namespace Charlotte.Games.Surfaces
 {
+	// サーフェス - メッセージウィンドウ(吹き出し)
+
 	public class Surface_MessageWindow : Surface
 	{
 		private double A = 0.0;

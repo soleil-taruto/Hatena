@@ -17,7 +17,7 @@ namespace Charlotte.Games.Surfaces
 			switch (typeName)
 			{
 				case "MessageWindow": surface = new Surface_MessageWindow(); break;
-				case "キャラクタ": surface = new Surface_キャラクタ(); break;
+				case "キャラクタ": surface = new Surface_Chara(); break;
 
 				// 新しいサーフェスをここへ追加..
 

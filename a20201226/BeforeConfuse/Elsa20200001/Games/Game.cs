@@ -19,7 +19,7 @@ namespace Charlotte.Games
 		public int Zanki = GameConsts.DEFAULT_ZANKI;
 		public int ZanBomb = GameConsts.DEFAULT_ZAN_BOMB;
 		public long Score = 0;
-		public Script Script = new Script_ダミー0001(); // 軽量なダミー初期オブジェクト
+		public Script Script = new Script_Dummy0001(); // 軽量なダミー初期オブジェクト
 		public Player Player = new Player();
 		public GameStatus Status = new GameStatus(); // 軽量なダミー初期オブジェクト
 
@@ -84,7 +84,7 @@ namespace Charlotte.Games
 			// reset
 			{
 				RippleEffect.Clear();
-				画面分割.Enabled = false;
+				FieldDivider.Enabled = false;
 			}
 
 			this.Player.Reset(false);
@@ -448,7 +448,7 @@ namespace Charlotte.Games
 						this.Draw当たり判定();
 					}
 
-					画面分割.EachFrame(this.Field);
+					FieldDivider.EachFrame(this.Field);
 				}
 
 				{
@@ -560,7 +560,7 @@ namespace Charlotte.Games
 				// ★★★ ゲームループの終わり ★★★
 			}
 
-			Ground.I.HiScore = this.Score; // 確実な同期
+			DDUtils.Maxim(ref Ground.I.HiScore, this.Score); // 確実な同期
 
 			// ★★★★★ ステータス反映
 			{

@@ -65,9 +65,9 @@ namespace Charlotte.Games.Surfaces
 			return (Surface_MessageWindow)this.Iterate().First(v => v is Surface_MessageWindow);
 		}
 
-		public IEnumerable<Surface_キャラクタ> GetAllキャラクタ()
+		public IEnumerable<Surface_Chara> GetAllキャラクタ()
 		{
-			return this.Iterate().Where(v => v is Surface_キャラクタ).Select(v => (Surface_キャラクタ)v);
+			return this.Iterate().Where(v => v is Surface_Chara).Select(v => (Surface_Chara)v);
 		}
 
 		// < 特別なサーフェス

@@ -22,8 +22,8 @@ namespace Charlotte.Games
 
 		public static StageInfo[] Stages =
 		{
-			new StageInfo(() => new Script_ステージ_01(), "01.通常ステージ"),
-			new StageInfo(() => new Script_ステージ_02(), "02.敵弾吸収テスト_ステージ"),
+			new StageInfo(() => new Script_Stage_01(), "01.通常ステージ"),
+			new StageInfo(() => new Script_Stage_02(), "02.敵弾吸収テスト_ステージ"),
 
 			// 後続のステージをここへ追加..
 		};

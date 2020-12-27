@@ -1337,6 +1337,11 @@ Earth
 
 ; -- Tropical-Rouge!
 
+Summer
+Coral
+Papaya
+Flamingo
+
 ";
 
 		#endregion

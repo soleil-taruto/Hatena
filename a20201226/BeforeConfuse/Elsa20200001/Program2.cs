@@ -37,8 +37,8 @@ namespace Charlotte
 				// アプリ固有 >
 
 				RippleEffect.INIT();
-				画面分割.INIT();
-				画面分割_Effect.INIT();
+				FieldDivider.INIT();
+				FieldDividerEffect.INIT();
 
 				// < アプリ固有
 			}

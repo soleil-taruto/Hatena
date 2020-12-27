@@ -116,6 +116,11 @@ namespace Charlotte.GameCommons
 			value = Math.Max(value, minval);
 		}
 
+		public static void Maxim(ref long value, long minval)
+		{
+			value = Math.Max(value, minval);
+		}
+
 		public static void Rotate(ref double x, ref double y, double rot)
 		{
 			double w;

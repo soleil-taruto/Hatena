@@ -363,7 +363,7 @@ namespace Charlotte.Games
 						if (Game.I.Frame % 4 == 0)
 						{
 							Ground.I.SE.SE_PLAYERSHOT.Play();
-							Game.I.Shots.Add(new Shot_Laserメディスン(pl_x, pl_y - 10.0, this.Level));
+							Game.I.Shots.Add(new Shot_MedicineLaser(pl_x, pl_y - 10.0, this.Level));
 						}
 					}
 					break;
@@ -541,7 +541,7 @@ namespace Charlotte.Games
 			{
 				case PlayerWho_e.メディスン:
 					{
-						Game.I.Shots.Add(new Shot_Bombメディスン(this.X, this.Y));
+						Game.I.Shots.Add(new Shot_MedicineBomb(this.X, this.Y));
 					}
 					break;
 
