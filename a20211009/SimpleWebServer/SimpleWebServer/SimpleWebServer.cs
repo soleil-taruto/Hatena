@@ -134,7 +134,7 @@ namespace SimpleWebServer
 		{
 			long fileSize = new FileInfo(file).Length;
 
-			for (long offset = 0L; offset < fileSize;)
+			for (long offset = 0L; offset < fileSize; )
 			{
 				int readSize = (int)Math.Min(fileSize - offset, 2000000L);
 				byte[] buff = new byte[readSize];
@@ -380,11 +380,11 @@ namespace SimpleWebServer
 
 			private Dictionary<string, string> Extension2ContentType = SCommon.CreateDictionaryIgnoreCase<string>();
 
-			private ContentTypeCollection()
-			{
-				for (int index = 0; index < Extension2ContentTypeResource.Length; index += 2)
-					this.Extension2ContentType.Add(Extension2ContentTypeResource[index], Extension2ContentTypeResource[index + 1]);
-			}
+
+
+
+
+
 
 			public string GetContentType(string ext)
 			{
@@ -492,10 +492,10 @@ namespace SimpleWebServer
 
 			// <---- prm
 
-			public HTTPServer()
-			{
-				PortNo = 80;
-			}
+
+
+
+
 
 			/// <summary>
 			/// Keep-Alive-タイムアウト_ミリ秒
@@ -1654,78 +1654,78 @@ namespace SimpleWebServer
 
 		public static class SCommon
 		{
-			private class S_AnonyDisposable : IDisposable
-			{
-				private Action Routine;
 
-				public S_AnonyDisposable(Action routine)
-				{
-					this.Routine = routine;
-				}
 
-				public void Dispose()
-				{
-					if (this.Routine != null)
-					{
-						this.Routine();
-						this.Routine = null;
-					}
-				}
-			}
 
-			public static IDisposable GetAnonyDisposable(Action routine)
-			{
-				return new S_AnonyDisposable(routine);
-			}
 
-			public static int Comp<T>(IList<T> a, IList<T> b, Comparison<T> comp)
-			{
-				int minlen = Math.Min(a.Count, b.Count);
 
-				for (int index = 0; index < minlen; index++)
-				{
-					int ret = comp(a[index], b[index]);
 
-					if (ret != 0)
-						return ret;
-				}
-				return Comp(a.Count, b.Count);
-			}
 
-			public static int IndexOf<T>(IList<T> list, Predicate<T> match)
-			{
-				for (int index = 0; index < list.Count; index++)
-					if (match(list[index]))
-						return index;
 
-				return -1; // not found
-			}
 
-			public static void Swap<T>(IList<T> list, int a, int b)
-			{
-				T tmp = list[a];
-				list[a] = list[b];
-				list[b] = tmp;
-			}
 
-			public static void Swap<T>(ref T a, ref T b)
-			{
-				T tmp = a;
-				a = b;
-				b = tmp;
-			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			public static byte[] EMPTY_BYTES = new byte[0];
 
-			public static int Comp(byte a, byte b)
-			{
-				return (int)a - (int)b;
-			}
 
-			public static int Comp(byte[] a, byte[] b)
-			{
-				return Comp(a, b, Comp);
-			}
+
+
+
+
+
+
+
+
 
 			public static byte[] GetSubBytes(byte[] src, int offset, int size)
 			{
@@ -1734,213 +1734,213 @@ namespace SimpleWebServer
 				return dest;
 			}
 
-			public static byte[] ToBytes(int value)
-			{
-				return ToBytes((uint)value);
-			}
 
-			public static int ToInt(byte[] src, int index = 0)
-			{
-				return (int)ToUInt(src, index);
-			}
 
-			public static byte[] ToBytes(uint value)
-			{
-				byte[] dest = new byte[4];
-				ToBytes(value, dest);
-				return dest;
-			}
 
-			public static void ToBytes(uint value, byte[] dest, int index = 0)
-			{
-				dest[index + 0] = (byte)((value >> 0) & 0xff);
-				dest[index + 1] = (byte)((value >> 8) & 0xff);
-				dest[index + 2] = (byte)((value >> 16) & 0xff);
-				dest[index + 3] = (byte)((value >> 24) & 0xff);
-			}
 
-			public static uint ToUInt(byte[] src, int index = 0)
-			{
-				return
-					((uint)src[index + 0] << 0) |
-					((uint)src[index + 1] << 8) |
-					((uint)src[index + 2] << 16) |
-					((uint)src[index + 3] << 24);
-			}
 
-			/// <summary>
-			/// バイト列を連結する。
-			/// 例：{ BYTE_ARR_1, BYTE_ARR_2, BYTE_ARR_3 } -> BYTE_ARR_1 + BYTE_ARR_2 + BYTE_ARR_3
-			/// </summary>
-			/// <param name="src">バイト列の引数配列</param>
-			/// <returns>連結したバイト列</returns>
-			public static byte[] Join(IList<byte[]> src)
-			{
-				int offset = 0;
 
-				foreach (byte[] block in src)
-					offset += block.Length;
 
-				byte[] dest = new byte[offset];
-				offset = 0;
 
-				foreach (byte[] block in src)
-				{
-					Array.Copy(block, 0, dest, offset, block.Length);
-					offset += block.Length;
-				}
-				return dest;
-			}
 
-			/// <summary>
-			/// バイト列を再分割可能なように連結する。
-			/// 再分割するには BinTools.Split を使用すること。
-			/// 例：{ BYTE_ARR_1, BYTE_ARR_2, BYTE_ARR_3 } -> SIZE(BYTE_ARR_1) + BYTE_ARR_1 + SIZE(BYTE_ARR_2) + BYTE_ARR_2 + SIZE(BYTE_ARR_3) + BYTE_ARR_3
-			/// SIZE(b) は BinTools.ToBytes(b.Length) である。
-			/// </summary>
-			/// <param name="src">バイト列の引数配列</param>
-			/// <returns>連結したバイト列</returns>
-			public static byte[] SplittableJoin(IList<byte[]> src)
-			{
-				int offset = 0;
 
-				foreach (byte[] block in src)
-					offset += 4 + block.Length;
 
-				byte[] dest = new byte[offset];
-				offset = 0;
 
-				foreach (byte[] block in src)
-				{
-					Array.Copy(ToBytes(block.Length), 0, dest, offset, 4);
-					offset += 4;
-					Array.Copy(block, 0, dest, offset, block.Length);
-					offset += block.Length;
-				}
-				return dest;
-			}
 
-			/// <summary>
-			/// バイト列を再分割する。
-			/// </summary>
-			/// <param name="src">連結したバイト列</param>
-			/// <returns>再分割したバイト列の配列</returns>
-			public static byte[][] Split(byte[] src)
-			{
-				List<byte[]> dest = new List<byte[]>();
 
-				for (int offset = 0; offset < src.Length;)
-				{
-					int size = ToInt(src, offset);
-					offset += 4;
-					dest.Add(GetSubBytes(src, offset, size));
-					offset += size;
-				}
-				return dest.ToArray();
-			}
 
-			public class Serializer
-			{
-				public static Serializer I = new Serializer();
 
-				private Serializer()
-				{ }
 
-				private const char DELIMITER = ':';
 
-				/// <summary>
-				/// 文字列のリストを連結してシリアライズします。
-				/// シリアライズされた文字列：
-				/// -- 空文字列ではない。
-				/// -- 書式 == ^[+/:=0-9A-Za-z]+$
-				/// </summary>
-				/// <param name="plainStrings">任意の文字列のリスト</param>
-				/// <returns>シリアライズされた文字列</returns>
-				public string Join(IList<string> plainStrings)
-				{
-					return DELIMITER + string.Join(string.Empty, plainStrings.Select(plainString => DELIMITER + Encode(plainString)));
-				}
 
-				/// <summary>
-				/// シリアライズされた文字列から文字列のリストを復元します。
-				/// </summary>
-				/// <param name="serializedString">シリアライズされた文字列</param>
-				/// <returns>元の文字列リスト</returns>
-				public string[] Split(string serializedString)
-				{
-					return serializedString.Split(DELIMITER).Skip(2).Select(encodedString => Decode(encodedString)).ToArray();
-				}
 
-				private string Encode(string plainString)
-				{
-					return SCommon.Base64.I.Encode(Encoding.UTF8.GetBytes(plainString));
-				}
 
-				private string Decode(string encodedString)
-				{
-					return Encoding.UTF8.GetString(SCommon.Base64.I.Decode(encodedString));
-				}
-			}
 
-			public static Dictionary<string, V> CreateDictionary<V>()
-			{
-				return new Dictionary<string, V>(new IECompString());
-			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			public static Dictionary<string, V> CreateDictionaryIgnoreCase<V>()
 			{
 				return new Dictionary<string, V>(new IECompStringIgnoreCase());
 			}
 
-			public const double MICRO = 1.0 / IMAX;
 
-			private static void CheckNaN(double value)
-			{
-				if (double.IsNaN(value))
-					throw new Exception("NaN");
-			}
 
-			public static double ToRange(double value, double minval, double maxval)
-			{
-				CheckNaN(value);
 
-				return Math.Max(minval, Math.Min(maxval, value));
-			}
 
-			public static int ToInt(double value)
-			{
-				CheckNaN(value);
 
-				if (value < 0.0)
-					return (int)(value - 0.5);
-				else
-					return (int)(value + 0.5);
-			}
 
-			public static long ToLong(double value)
-			{
-				CheckNaN(value);
 
-				if (value < 0.0)
-					return (long)(value - 0.5);
-				else
-					return (long)(value + 0.5);
-			}
 
-			/// <summary>
-			/// 列挙の列挙(2次元列挙)を列挙(1次元列挙)に変換する。
-			/// 例：{{ A, B, C }, { D, E, F }, { G, H, I }} -> { A, B, C, D, E, F, G, H, I }
-			/// 但し Concat(new X[] { AAA, BBB, CCC }) は AAA.Concat(BBB).Concat(CCC) と同じ。
-			/// </summary>
-			/// <typeparam name="T">要素の型</typeparam>
-			/// <param name="src">列挙の列挙(2次元列挙)</param>
-			/// <returns>列挙(1次元列挙)</returns>
-			public static IEnumerable<T> Concat<T>(IEnumerable<IEnumerable<T>> src)
-			{
-				foreach (IEnumerable<T> part in src)
-					foreach (T element in part)
-						yield return element;
-			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			/// <summary>
 			/// 列挙をゲッターメソッドでラップします。
@@ -2074,185 +2074,185 @@ namespace SimpleWebServer
 				}
 			}
 
-			public static byte[] Read(FileStream reader, int size)
-			{
-				byte[] buff = new byte[size];
-				Read(reader, buff);
-				return buff;
-			}
 
-			public static void Read(FileStream reader, byte[] buff, int offset = 0)
-			{
-				Read(reader, buff, offset, buff.Length - offset);
-			}
 
-			public static void Read(FileStream reader, byte[] buff, int offset, int count)
-			{
-				if (reader.Read(buff, offset, count) != count)
-				{
-					throw new Exception("データの途中でファイルの終端に到達しました。");
-				}
-			}
 
-			public static void Write(FileStream writer, byte[] buff, int offset = 0)
-			{
-				writer.Write(buff, offset, buff.Length - offset);
-			}
 
-			/// <summary>
-			/// 行リストをテキストに変換します。
-			/// </summary>
-			/// <param name="lines">行リスト</param>
-			/// <returns>テキスト</returns>
-			public static string LinesToText(IList<string> lines)
-			{
-				return lines.Count == 0 ? "" : string.Join("\r\n", lines) + "\r\n";
-			}
 
-			/// <summary>
-			/// テキストを行リストに変換します。
-			/// </summary>
-			/// <param name="text">テキスト</param>
-			/// <returns>行リスト</returns>
-			public static string[] TextToLines(string text)
-			{
-				text = text.Replace("\r", "");
 
-				string[] lines = text.Split('\n');
 
-				if (1 <= lines.Length && lines[lines.Length - 1] == "")
-				{
-					lines = lines.Take(lines.Length - 1).ToArray();
-				}
-				return lines;
-			}
 
-			/// <summary>
-			/// ファイル読み込みハンドルっぽいコールバック
-			/// </summary>
-			/// <param name="buff">読み込んだデータの書き込み先</param>
-			/// <param name="offset">書き込み開始位置</param>
-			/// <param name="count">書き込みサイズ</param>
-			/// <returns>実際に読み込んだサイズ(1～), ～0 == これ以上読み込めない</returns>
-			public delegate int Read_d(byte[] buff, int offset, int count);
 
-			/// <summary>
-			/// ファイル書き込みハンドルっぽいコールバック
-			/// </summary>
-			/// <param name="buff">書き込むデータの読み込み先</param>
-			/// <param name="offset">読み込み開始位置</param>
-			/// <param name="count">読み込みサイズ</param>
-			public delegate void Write_d(byte[] buff, int offset, int count);
 
-			public static void ReadToEnd(Read_d reader, Write_d writer)
-			{
-				byte[] buff = new byte[2 * 1024 * 1024];
 
-				for (; ; )
-				{
-					int readSize = reader(buff, 0, buff.Length);
 
-					if (readSize <= 0)
-						break;
 
-					writer(buff, 0, readSize);
-				}
-			}
 
-			public const int IMAX = 1000000000; // 10^9
-			public const long IMAX_64 = 1000000000000000000L; // 10^18
 
-			public static int Comp(int a, int b)
-			{
-				if (a < b)
-					return -1;
 
-				if (a > b)
-					return 1;
 
-				return 0;
-			}
 
-			public static int Comp(long a, long b)
-			{
-				if (a < b)
-					return -1;
 
-				if (a > b)
-					return 1;
 
-				return 0;
-			}
 
-			public static int Comp(double a, double b)
-			{
-				if (a < b)
-					return -1;
 
-				if (a > b)
-					return 1;
 
-				return 0;
-			}
 
-			public static int ToRange(int value, int minval, int maxval)
-			{
-				return Math.Max(minval, Math.Min(maxval, value));
-			}
 
-			public static long ToRange(long value, long minval, long maxval)
-			{
-				return Math.Max(minval, Math.Min(maxval, value));
-			}
 
-			public static bool IsRange(int value, int minval, int maxval)
-			{
-				return minval <= value && value <= maxval;
-			}
 
-			public static bool IsRange(long value, long minval, long maxval)
-			{
-				return minval <= value && value <= maxval;
-			}
 
-			public static bool IsRange(double value, double minval, double maxval)
-			{
-				return minval <= value && value <= maxval;
-			}
 
-			public static int ToInt(string str, int minval, int maxval, int defval)
-			{
-				try
-				{
-					int value = int.Parse(str);
 
-					if (value < minval || maxval < value)
-						throw null;
 
-					return value;
-				}
-				catch
-				{
-					return defval;
-				}
-			}
 
-			public static long ToLong(string str, long minval, long maxval, long defval)
-			{
-				try
-				{
-					long value = long.Parse(str);
 
-					if (value < minval || maxval < value)
-						throw null;
 
-					return value;
-				}
-				catch
-				{
-					return defval;
-				}
-			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			public static string ToJString(byte[] src, bool okJpn, bool okRet, bool okTab, bool okSpc)
 			{
@@ -2515,49 +2515,49 @@ namespace SimpleWebServer
 				}
 			}
 
-			public static class Hex
-			{
-				public static string ToString(byte[] src)
-				{
-					StringBuilder buff = new StringBuilder(src.Length * 2);
 
-					foreach (byte chr in src)
-					{
-						buff.Append(hexadecimal[chr >> 4]);
-						buff.Append(hexadecimal[chr & 0x0f]);
-					}
-					return buff.ToString();
-				}
 
-				public static byte[] ToBytes(string src)
-				{
-					if (src.Length % 2 != 0)
-						throw new ArgumentException("入力文字列の長さに問題があります。");
 
-					byte[] dest = new byte[src.Length / 2];
 
-					for (int index = 0; index < dest.Length; index++)
-					{
-						int hi = To4Bit(src[index * 2 + 0]);
-						int lw = To4Bit(src[index * 2 + 1]);
 
-						dest[index] = (byte)((hi << 4) | lw);
-					}
-					return dest;
-				}
 
-				private static int To4Bit(char chr)
-				{
-					int ret = hexadecimal.IndexOf(char.ToLower(chr));
 
-					if (ret == -1)
-						throw new ArgumentException("入力文字列に含まれる文字に問題があります。");
 
-					return ret;
-				}
-			}
 
-			public static string[] EMPTY_STRINGS = new string[0];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			private static Encoding _i_ENCODING_SJIS = null;
 
@@ -2567,31 +2567,31 @@ namespace SimpleWebServer
 				{
 					if (_i_ENCODING_SJIS == null)
 					{
-						Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+						//Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // TODO
 						_i_ENCODING_SJIS = Encoding.GetEncoding(932);
 					}
 					return _i_ENCODING_SJIS;
 				}
 			}
 
-			public static string BINADECIMAL = "01";
-			public static string OCTODECIMAL = "012234567";
-			public static string DECIMAL = "0123456789";
-			public static string HEXADECIMAL = "0123456789ABCDEF";
-			public static string hexadecimal = "0123456789abcdef";
 
-			public static string ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-			public static string alpha = "abcdefghijklmnopqrstuvwxyz";
+
+
+
+
+
+
+
 			public static string PUNCT =
 				S_GetString_SJISHalfCodeRange(0x21, 0x2f) +
 				S_GetString_SJISHalfCodeRange(0x3a, 0x40) +
 				S_GetString_SJISHalfCodeRange(0x5b, 0x60) +
 				S_GetString_SJISHalfCodeRange(0x7b, 0x7e);
 
-			public static string ASCII = DECIMAL + ALPHA + alpha + PUNCT; // == GetString_SJISHalfCodeRange(0x21, 0x7e)
-			public static string KANA = S_GetString_SJISHalfCodeRange(0xa1, 0xdf);
 
-			public static string HALF = ASCII + KANA;
+
+
+
 
 			private static string S_GetString_SJISHalfCodeRange(int codeMin, int codeMax)
 			{
@@ -2604,10 +2604,10 @@ namespace SimpleWebServer
 				return ENCODING_SJIS.GetString(buff);
 			}
 
-			public static string MBC_DECIMAL = S_GetString_SJISCodeRange(0x82, 0x4f, 0x58);
-			public static string MBC_ALPHA = S_GetString_SJISCodeRange(0x82, 0x60, 0x79);
-			public static string mbc_alpha = S_GetString_SJISCodeRange(0x82, 0x81, 0x9a);
-			public static string MBC_SPACE = S_GetString_SJISCodeRange(0x81, 0x40, 0x40);
+
+
+
+
 			public static string MBC_PUNCT =
 				S_GetString_SJISCodeRange(0x81, 0x41, 0x7e) +
 				S_GetString_SJISCodeRange(0x81, 0x80, 0xac) +
@@ -2630,7 +2630,7 @@ namespace SimpleWebServer
 
 			public static string MBC_CHOUONPU = S_GetString_SJISCodeRange(0x81, 0x5b, 0x5b); // 815b == 長音符 -- ひらがなとカタカナの長音符は同じ文字
 
-			public static string MBC_HIRA = S_GetString_SJISCodeRange(0x82, 0x9f, 0xf1);
+
 			public static string MBC_KANA =
 				S_GetString_SJISCodeRange(0x83, 0x40, 0x7e) +
 				S_GetString_SJISCodeRange(0x83, 0x80, 0x96) + MBC_CHOUONPU;
@@ -2647,30 +2647,30 @@ namespace SimpleWebServer
 				return ENCODING_SJIS.GetString(buff);
 			}
 
-			public static int Comp(string a, string b)
-			{
-				// MEMO: a.CompareTo(b) -- 三すくみの一件以来今でも信用出来ないので使わない。
 
-				return Comp(Encoding.UTF8.GetBytes(a), Encoding.UTF8.GetBytes(b));
-			}
 
-			public static int CompIgnoreCase(string a, string b)
-			{
-				return Comp(a.ToLower(), b.ToLower());
-			}
 
-			public class IECompString : IEqualityComparer<string>
-			{
-				public bool Equals(string a, string b)
-				{
-					return a == b;
-				}
 
-				public int GetHashCode(string a)
-				{
-					return a.GetHashCode();
-				}
-			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			public class IECompStringIgnoreCase : IEqualityComparer<string>
 			{
@@ -2690,254 +2690,254 @@ namespace SimpleWebServer
 				return a.ToLower() == b.ToLower();
 			}
 
-			public static bool StartsWithIgnoreCase(string str, string ptn)
-			{
-				return str.ToLower().StartsWith(ptn.ToLower());
-			}
 
-			public static bool EndsWithIgnoreCase(string str, string ptn)
-			{
-				return str.ToLower().EndsWith(ptn.ToLower());
-			}
+
+
+
+
+
+
+
+
 
 			public static bool ContainsIgnoreCase(string str, string ptn)
 			{
 				return str.ToLower().Contains(ptn.ToLower());
 			}
 
-			public static int IndexOfIgnoreCase(string str, string ptn)
-			{
-				return str.ToLower().IndexOf(ptn.ToLower());
-			}
 
-			public static int IndexOfIgnoreCase(string str, char chr)
-			{
-				return str.ToLower().IndexOf(char.ToLower(chr));
-			}
 
-			public static int IndexOf(IList<string> strs, string str)
-			{
-				for (int index = 0; index < strs.Count; index++)
-					if (strs[index] == str)
-						return index;
 
-				return -1; // not found
-			}
 
-			public static int IndexOfIgnoreCase(IList<string> strs, string str)
-			{
-				string lStr = str.ToLower();
 
-				for (int index = 0; index < strs.Count; index++)
-					if (strs[index].ToLower() == lStr)
-						return index;
 
-				return -1; // not found
-			}
 
-			/// <summary>
-			/// 文字列を区切り文字で分割する。
-			/// </summary>
-			/// <param name="str">文字列</param>
-			/// <param name="delimiters">区切り文字の集合</param>
-			/// <param name="meaningFlag">区切り文字(delimiters)以外を区切り文字とするか</param>
-			/// <param name="ignoreEmpty">空文字列のトークンを除去するか</param>
-			/// <param name="limit">最大トークン数(1～), 0 == 無制限</param>
-			/// <returns>トークン配列</returns>
-			public static string[] Tokenize(string str, string delimiters, bool meaningFlag = false, bool ignoreEmpty = false, int limit = 0)
-			{
-				StringBuilder buff = new StringBuilder();
-				List<string> tokens = new List<string>();
 
-				foreach (char chr in str)
-				{
-					if (tokens.Count + 1 == limit || delimiters.Contains(chr) == meaningFlag)
-					{
-						buff.Append(chr);
-					}
-					else
-					{
-						if (!ignoreEmpty || buff.Length != 0)
-							tokens.Add(buff.ToString());
 
-						buff = new StringBuilder();
-					}
-				}
-				if (!ignoreEmpty || buff.Length != 0)
-					tokens.Add(buff.ToString());
 
-				return tokens.ToArray();
-			}
 
-			public static bool HasSameChar(string str)
-			{
-				for (int r = 1; r < str.Length; r++)
-					for (int l = 0; l < r; l++)
-						if (str[l] == str[r])
-							return true;
 
-				return false;
-			}
 
-			public static string[] ParseIsland(string text, string singleTag, bool ignoreCase = false)
-			{
-				int start;
 
-				if (ignoreCase)
-					start = text.ToLower().IndexOf(singleTag.ToLower());
-				else
-					start = text.IndexOf(singleTag);
 
-				if (start == -1)
-					return null;
 
-				int end = start + singleTag.Length;
 
-				return new string[]
-				{
-				text.Substring(0, start),
-				text.Substring(start, end - start),
-				text.Substring(end),
-				};
-			}
 
-			public static string[] ParseEnclosed(string text, string openTag, string closeTag, bool ignoreCase = false)
-			{
-				string[] starts = ParseIsland(text, openTag, ignoreCase);
 
-				if (starts == null)
-					return null;
 
-				string[] ends = ParseIsland(starts[2], closeTag, ignoreCase);
 
-				if (ends == null)
-					return null;
 
-				return new string[]
-				{
-				starts[0],
-				starts[1],
-				ends[0],
-				ends[1],
-				ends[2],
-				};
-			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			#region Base64
 
-			public class Base64
-			{
-				private static Base64 _i = null;
 
-				public static Base64 I
-				{
-					get
-					{
-						if (_i == null)
-							_i = new Base64();
 
-						return _i;
-					}
-				}
 
-				private char[] Chars;
-				private byte[] CharMap;
 
-				private const char CHAR_PADDING = '=';
 
-				private Base64()
-				{
-					this.Chars = (SCommon.ALPHA + SCommon.alpha + SCommon.DECIMAL + "+/").ToArray();
-					this.CharMap = new byte[(int)char.MaxValue + 1];
 
-					for (int index = 0; index < 64; index++)
-						this.CharMap[this.Chars[index]] = (byte)index;
-				}
 
-				public string Encode(byte[] src)
-				{
-					char[] dest = new char[((src.Length + 2) / 3) * 4];
-					int writer = 0;
-					int index = 0;
-					int chr;
 
-					while (index + 3 <= src.Length)
-					{
-						chr = (src[index++] & 0xff) << 16;
-						chr |= (src[index++] & 0xff) << 8;
-						chr |= src[index++] & 0xff;
-						dest[writer++] = this.Chars[chr >> 18];
-						dest[writer++] = this.Chars[(chr >> 12) & 0x3f];
-						dest[writer++] = this.Chars[(chr >> 6) & 0x3f];
-						dest[writer++] = this.Chars[chr & 0x3f];
-					}
-					if (index + 2 == src.Length)
-					{
-						chr = (src[index++] & 0xff) << 8;
-						chr |= src[index++] & 0xff;
-						dest[writer++] = this.Chars[chr >> 10];
-						dest[writer++] = this.Chars[(chr >> 4) & 0x3f];
-						dest[writer++] = this.Chars[(chr << 2) & 0x3c];
-						dest[writer++] = CHAR_PADDING;
-					}
-					else if (index + 1 == src.Length)
-					{
-						chr = src[index++] & 0xff;
-						dest[writer++] = this.Chars[chr >> 2];
-						dest[writer++] = this.Chars[(chr << 4) & 0x30];
-						dest[writer++] = CHAR_PADDING;
-						dest[writer++] = CHAR_PADDING;
-					}
-					return new string(dest);
-				}
 
-				public byte[] Decode(string src)
-				{
-					int destSize = (src.Length / 4) * 3;
 
-					if (destSize != 0)
-					{
-						if (src[src.Length - 2] == CHAR_PADDING)
-						{
-							destSize -= 2;
-						}
-						else if (src[src.Length - 1] == CHAR_PADDING)
-						{
-							destSize--;
-						}
-					}
-					byte[] dest = new byte[destSize];
-					int writer = 0;
-					int index = 0;
-					int chr;
 
-					while (writer + 3 <= destSize)
-					{
-						chr = (this.CharMap[src[index++]] & 0x3f) << 18;
-						chr |= (this.CharMap[src[index++]] & 0x3f) << 12;
-						chr |= (this.CharMap[src[index++]] & 0x3f) << 6;
-						chr |= this.CharMap[src[index++]] & 0x3f;
-						dest[writer++] = (byte)(chr >> 16);
-						dest[writer++] = (byte)((chr >> 8) & 0xff);
-						dest[writer++] = (byte)(chr & 0xff);
-					}
-					if (writer + 2 == destSize)
-					{
-						chr = (this.CharMap[src[index++]] & 0x3f) << 10;
-						chr |= (this.CharMap[src[index++]] & 0x3f) << 4;
-						chr |= (this.CharMap[src[index++]] & 0x3c) >> 2;
-						dest[writer++] = (byte)(chr >> 8);
-						dest[writer++] = (byte)(chr & 0xff);
-					}
-					else if (writer + 1 == destSize)
-					{
-						chr = (this.CharMap[src[index++]] & 0x3f) << 2;
-						chr |= (this.CharMap[src[index++]] & 0x30) >> 4;
-						dest[writer++] = (byte)chr;
-					}
-					return dest;
-				}
-			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			#endregion
 
@@ -3304,14 +3304,14 @@ namespace SimpleWebServer
 				}
 			}
 
-			public static RootInfo CreateProcessRoot()
-			{
-				// 環境変数 TMP のパスは ProcMain.CheckLogonUserAndTmp() で検査している。
 
-				// 環境変数 TMP のフォルダの配下は定期的に削除される。-> プロセス終了時の削除漏れはケアしない。
 
-				return new RootInfo(Path.Combine(Environment.GetEnvironmentVariable("TMP"), ProcMain.APP_IDENT + "_" + Process.GetCurrentProcess().Id));
-			}
+
+
+
+
+
+
 
 			private static long CtorCounter = 0L;
 
@@ -3367,7 +3367,7 @@ namespace SimpleWebServer
 
 		public static class ProcMain
 		{
-			public static string APP_IDENT = "{4f15ebac-66b4-4544-999e-b0c44490b8f1}";
+
 
 			public static Action<object> WriteLog = message => Console.WriteLine(message);
 		}
