@@ -380,11 +380,11 @@ namespace SimpleWebServer
 
 			private Dictionary<string, string> Extension2ContentType = SCommon.CreateDictionaryIgnoreCase<string>();
 
-
-
-
-
-
+			private ContentTypeCollection()
+			{
+				for (int index = 0; index < Extension2ContentTypeResource.Length; index += 2)
+					this.Extension2ContentType.Add(Extension2ContentTypeResource[index], Extension2ContentTypeResource[index + 1]);
+			}
 
 			public string GetContentType(string ext)
 			{
@@ -492,10 +492,10 @@ namespace SimpleWebServer
 
 			// <---- prm
 
-
-
-
-
+			public HTTPServer()
+			{
+				PortNo = 80;
+			}
 
 			/// <summary>
 			/// Keep-Alive-タイムアウト_ミリ秒
@@ -2567,7 +2567,7 @@ namespace SimpleWebServer
 				{
 					if (_i_ENCODING_SJIS == null)
 					{
-						//Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // TODO
+						Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 						_i_ENCODING_SJIS = Encoding.GetEncoding(932);
 					}
 					return _i_ENCODING_SJIS;
