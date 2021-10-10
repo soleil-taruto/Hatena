@@ -6,7 +6,11 @@ namespace SimpleWebServer
 	{
 		static void Main(string[] args)
 		{
-			new SimpleWebServer().Perform();
+			new SimpleWebServer()
+			{
+				DocRoot = @"C:\temp",
+			}
+			.Perform();
 		}
 	}
 }
