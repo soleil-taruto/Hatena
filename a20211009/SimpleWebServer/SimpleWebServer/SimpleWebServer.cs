@@ -96,7 +96,7 @@ namespace SimpleWebServer
 				FileInfo fileInfo = new FileInfo(path);
 
 				channel.ResHeaderPairs.Add(new string[] { "Content-Length", fileInfo.Length.ToString() });
-				channel.ResHeaderPairs.Add(new string[] { "X-Last-Modified-Time", new SCommon.SimpleDateTime(fileInfo.LastWriteTime).ToString("{0}/{1:D2}/{2:D2} {4:D2}:{5:D2}:{6:D2}") });
+				channel.ResHeaderPairs.Add(new string[] { "X-Last-Modified-Time", fileInfo.LastWriteTime.Ticks.ToString() });
 
 				channel.ResBody = null;
 			}
@@ -112,7 +112,7 @@ namespace SimpleWebServer
 		private static string GetHeaderValue(HTTPServerChannel channel, string name)
 		{
 			foreach (string[] pair in channel.HeaderPairs)
-				if (SCommon.EqualsIgnoreCase(pair[0], name))
+				if (EqualsIgnoreCase(pair[0], name))
 					return pair[1];
 
 			throw new Exception("No header key: " + name);
@@ -378,7 +378,7 @@ namespace SimpleWebServer
 
 			#endregion
 
-			private Dictionary<string, string> Extension2ContentType = SCommon.CreateDictionaryIgnoreCase<string>();
+			private Dictionary<string, string> Extension2ContentType = CreateDictionaryIgnoreCase<string>();
 
 			private ContentTypeCollection()
 			{
@@ -448,7 +448,7 @@ namespace SimpleWebServer
 				if (localPathSizeMax < str.Length) // HACK: 元にしたコードではバイト列の長さで判定している。
 					str = str.Substring(0, localPathSizeMax);
 
-				str = SCommon.ToJString(SCommon.ENCODING_SJIS.GetBytes(str), true, false, false, true);
+				//str = SCommon.ToJString(SCommon.ENCODING_SJIS.GetBytes(str), true, false, false, true);
 
 				string[] words = str.Split('.');
 
@@ -460,7 +460,7 @@ namespace SimpleWebServer
 
 					if (
 						index == 0 &&
-						GetReservedWordsForWindowsPath().Any(resWord => SCommon.EqualsIgnoreCase(resWord, word)) ||
+						GetReservedWordsForWindowsPath().Any(resWord => EqualsIgnoreCase(resWord, word)) ||
 						word.Any(chr => NG_CHARS.IndexOf(chr) != -1)
 						)
 						word = ALT_WORD;
@@ -650,7 +650,7 @@ namespace SimpleWebServer
 					{
 						if (src[index] == 0x25) // ? '%'
 						{
-							dest.WriteByte((byte)Convert.ToInt32(Encoding.ASCII.GetString(SCommon.GetSubBytes(src, index + 1, 2)), 16));
+							dest.WriteByte((byte)Convert.ToInt32(Encoding.ASCII.GetString(new byte[] { src[index + 1], src[index + 2] }), 16));
 							index += 2;
 						}
 						else if (src[index] == 0x2b) // ? '+'
@@ -780,28 +780,28 @@ namespace SimpleWebServer
 						continue;
 					}
 
-					if (SCommon.EqualsIgnoreCase(key, "Content-Length"))
+					if (EqualsIgnoreCase(key, "Content-Length"))
 					{
 						if (value.Length < 1 || 10 < value.Length)
 							throw new Exception("Bad Content-Length value");
 
 						this.ContentLength = int.Parse(value);
 					}
-					else if (SCommon.EqualsIgnoreCase(key, "Transfer-Encoding"))
+					else if (EqualsIgnoreCase(key, "Transfer-Encoding"))
 					{
-						this.Chunked = SCommon.ContainsIgnoreCase(value, "chunked");
+						this.Chunked = ContainsIgnoreCase(value, "chunked");
 					}
-					else if (SCommon.EqualsIgnoreCase(key, "Content-Type"))
+					else if (EqualsIgnoreCase(key, "Content-Type"))
 					{
 						this.ContentType = value;
 					}
-					else if (SCommon.EqualsIgnoreCase(key, "Expect"))
+					else if (EqualsIgnoreCase(key, "Expect"))
 					{
-						this.Expect100Continue = SCommon.ContainsIgnoreCase(value, "100-continue");
+						this.Expect100Continue = ContainsIgnoreCase(value, "100-continue");
 					}
-					else if (SCommon.EqualsIgnoreCase(key, "Connection"))
+					else if (EqualsIgnoreCase(key, "Connection"))
 					{
-						this.KeepAlive = SCommon.ContainsIgnoreCase(value, "keep-alive");
+						this.KeepAlive = ContainsIgnoreCase(value, "keep-alive");
 					}
 				}
 			}
@@ -1000,66 +1000,27 @@ namespace SimpleWebServer
 
 		public class HTTPBodyOutputStream : IDisposable
 		{
-			private WorkingDir WD = null;
-			private string BuffFile = null;
-			private int WroteSize = 0;
-
-			private string GetBuffFile()
+			public void Write(byte[] data)
 			{
-				if (this.WD == null)
-				{
-					this.WD = new WorkingDir();
-					this.BuffFile = this.WD.MakePath();
-				}
-				return this.BuffFile;
-			}
-
-			public void Write(byte[] data, int offset = 0)
-			{
-				this.Write(data, offset, data.Length - offset);
-			}
-
-			public void Write(byte[] data, int offset, int count)
-			{
-				using (FileStream writer = new FileStream(this.GetBuffFile(), FileMode.Append, FileAccess.Write))
-				{
-					writer.Write(data, offset, count);
-				}
-				this.WroteSize += count;
+				throw new Exception("REJECT-BODY");
 			}
 
 			public int Count
 			{
 				get
 				{
-					return this.WroteSize;
+					return 0;
 				}
 			}
 
 			public byte[] ToByteArray()
 			{
-				byte[] data;
-
-				if (this.WroteSize == 0)
-				{
-					data = SCommon.EMPTY_BYTES;
-				}
-				else
-				{
-					data = File.ReadAllBytes(this.BuffFile);
-					File.WriteAllBytes(this.BuffFile, SCommon.EMPTY_BYTES);
-					this.WroteSize = 0;
-				}
-				return data;
+				return new byte[0];
 			}
 
 			public void Dispose()
 			{
-				if (this.WD != null)
-				{
-					this.WD.Dispose();
-					this.WD = null;
-				}
+				// noop
 			}
 		}
 
@@ -1143,7 +1104,7 @@ namespace SimpleWebServer
 									handler = null; // もう使わない。
 									channel.Handler.Blocking = false;
 									channel.ID = SockCommon.IDIssuer.Issue();
-									channel.Connected = SCommon.Supplier(this.E_Connected(channel));
+									channel.Connected = Supplier(this.E_Connected(channel));
 									channel.BodyOutputStream = new HTTPBodyOutputStream();
 
 									this.Channels.Add(channel);
@@ -1180,7 +1141,8 @@ namespace SimpleWebServer
 									SockCommon.WriteLog(SockCommon.ErrorLevel_e.INFO, "通信終了 " + channel.ID);
 
 									this.Disconnect(channel);
-									SCommon.FastDesertElement(this.Channels, index);
+									this.Channels[index] = this.Channels[this.Channels.Count - 1];
+									this.Channels.RemoveAt(this.Channels.Count - 1);
 
 									SockCommon.TimeWaitMonitor.Disconnect();
 								}
@@ -1516,9 +1478,9 @@ namespace SimpleWebServer
 						this.Add(new byte[] { chr });
 
 					for (byte chr = 0xa1; chr <= 0xdf; chr++) // 半角カナ
-						this.Add(Encoding.UTF8.GetBytes(SCommon.ENCODING_SJIS.GetString(new byte[] { chr })));
+						this.Add(Encoding.UTF8.GetBytes(new string(new char[] { SJISHanKanaToUnicode(chr) })));
 
-					foreach (char chr in SCommon.GetJChars()) // 2バイト文字
+					foreach (char chr in GetUnicodeListOfSJISMBC()) // 2バイト文字
 						this.Add(Encoding.UTF8.GetBytes(new string(new char[] { chr })));
 				}
 
@@ -1652,921 +1614,60 @@ namespace SimpleWebServer
 			}
 		}
 
-		public static class SCommon
+		public static Dictionary<string, V> CreateDictionaryIgnoreCase<V>()
 		{
-			public static byte[] EMPTY_BYTES = new byte[0];
+			return new Dictionary<string, V>(new IECompStringIgnoreCase());
+		}
 
-			public static byte[] GetSubBytes(byte[] src, int offset, int size)
+		public static Func<T> Supplier<T>(IEnumerable<T> src)
+		{
+			IEnumerator<T> reader = src.GetEnumerator();
+
+			return () =>
 			{
-				byte[] dest = new byte[size];
-				Array.Copy(src, offset, dest, 0, size);
-				return dest;
-			}
-
-			public static Dictionary<string, V> CreateDictionaryIgnoreCase<V>()
-			{
-				return new Dictionary<string, V>(new IECompStringIgnoreCase());
-			}
-
-			/// <summary>
-			/// 列挙をゲッターメソッドでラップします。
-			/// 例：{ A, B, C } -> 呼び出し毎に右の順で戻り値を返す { A, B, C, default(T), default(T), default(T), ... }
-			/// </summary>
-			/// <typeparam name="T">要素の型</typeparam>
-			/// <param name="src">列挙</param>
-			/// <returns>ゲッターメソッド</returns>
-			public static Func<T> Supplier<T>(IEnumerable<T> src)
-			{
-				IEnumerator<T> reader = src.GetEnumerator();
-
-				return () =>
+				if (reader != null)
 				{
-					if (reader != null)
-					{
-						if (reader.MoveNext())
-							return reader.Current;
+					if (reader.MoveNext())
+						return reader.Current;
 
-						reader.Dispose();
-						reader = null;
-					}
-					return default(T);
-				};
-			}
-
-			public static T DesertElement<T>(List<T> list, int index)
-			{
-				T ret = list[index];
-				list.RemoveAt(index);
-				return ret;
-			}
-
-			public static T UnaddElement<T>(List<T> list)
-			{
-				return DesertElement(list, list.Count - 1);
-			}
-
-			public static T FastDesertElement<T>(List<T> list, int index)
-			{
-				T ret = UnaddElement(list);
-
-				if (index < list.Count)
-				{
-					T ret2 = list[index];
-					list[index] = ret;
-					ret = ret2;
+					reader.Dispose();
+					reader = null;
 				}
-				return ret;
-			}
+				return default(T);
+			};
+		}
 
-			private const int IO_TRY_MAX = 10;
-
-			public static void DeletePath(string path)
-			{
-				if (string.IsNullOrEmpty(path))
-					throw new Exception("削除しようとしたパスは null 又は空文字列です。");
-
-				if (File.Exists(path))
-				{
-					for (int trycnt = 1; ; trycnt++)
-					{
-						try
-						{
-							File.Delete(path);
-						}
-						catch (Exception ex)
-						{
-							if (IO_TRY_MAX <= trycnt)
-								throw new Exception("ファイルの削除に失敗しました。" + path + "\r\n" + ex);
-						}
-						if (!File.Exists(path))
-							break;
-
-						if (IO_TRY_MAX <= trycnt)
-							throw new Exception("ファイルの削除に失敗しました。" + path);
-
-						ProcMain.WriteLog("ファイルの削除をリトライします。" + path);
-						Thread.Sleep(trycnt * 100);
-					}
-				}
-				else if (Directory.Exists(path))
-				{
-					for (int trycnt = 1; ; trycnt++)
-					{
-						try
-						{
-							Directory.Delete(path, true);
-						}
-						catch (Exception ex)
-						{
-							if (IO_TRY_MAX <= trycnt)
-								throw new Exception("ディレクトリの削除に失敗しました。" + path + "\r\n" + ex);
-						}
-						if (!Directory.Exists(path))
-							break;
-
-						if (IO_TRY_MAX <= trycnt)
-							throw new Exception("ディレクトリの削除に失敗しました。" + path);
-
-						ProcMain.WriteLog("ディレクトリの削除をリトライします。" + path);
-						Thread.Sleep(trycnt * 100);
-					}
-				}
-			}
-
-			public static void CreateDir(string dir)
-			{
-				if (string.IsNullOrEmpty(dir))
-					throw new Exception("作成しようとしたディレクトリは null 又は空文字列です。");
-
-				for (int trycnt = 1; ; trycnt++)
-				{
-					try
-					{
-						Directory.CreateDirectory(dir); // ディレクトリが存在するときは何もしない。
-					}
-					catch (Exception ex)
-					{
-						if (IO_TRY_MAX <= trycnt)
-							throw new Exception("ディレクトリを作成出来ません。" + dir + "\r\n" + ex);
-					}
-					if (Directory.Exists(dir))
-						break;
-
-					if (IO_TRY_MAX <= trycnt)
-						throw new Exception("ディレクトリを作成出来ません。" + dir);
-
-					ProcMain.WriteLog("ディレクトリの作成をリトライします。" + dir);
-					Thread.Sleep(trycnt * 100);
-				}
-			}
-
-			public static string ToJString(byte[] src, bool okJpn, bool okRet, bool okTab, bool okSpc)
-			{
-				if (src == null)
-					src = new byte[0];
-
-				using (MemoryStream dest = new MemoryStream())
-				{
-					for (int index = 0; index < src.Length; index++)
-					{
-						byte chr = src[index];
-
-						if (chr == 0x09) // ? '\t'
-						{
-							if (!okTab)
-								continue;
-						}
-						else if (chr == 0x0a) // ? '\n'
-						{
-							if (!okRet)
-								continue;
-						}
-						else if (chr < 0x20) // ? other control code
-						{
-							continue;
-						}
-						else if (chr == 0x20) // ? ' '
-						{
-							if (!okSpc)
-								continue;
-						}
-						else if (chr <= 0x7e) // ? ascii
-						{
-							// noop
-						}
-						else if (0xa1 <= chr && chr <= 0xdf) // ? kana
-						{
-							if (!okJpn)
-								continue;
-						}
-						else // ? 全角文字の前半 || 破損
-						{
-							if (!okJpn)
-								continue;
-
-							index++;
-
-							if (src.Length <= index) // ? 後半欠損
-								break;
-
-							if (!S_JChar.I.Contains(chr, src[index])) // ? 破損
-								continue;
-
-							dest.WriteByte(chr);
-							chr = src[index];
-						}
-						dest.WriteByte(chr);
-					}
-					return ENCODING_SJIS.GetString(dest.ToArray());
-				}
-			}
-
-			/// <summary>
-			/// SJIS(CP-932)の2バイト文字を全て返す。
-			/// </summary>
-			/// <returns>SJIS(CP-932)の2バイト文字の文字列</returns>
-			public static string GetJChars()
-			{
-				return ENCODING_SJIS.GetString(GetJCharBytes().ToArray());
-			}
-
-			/// <summary>
-			/// SJIS(CP-932)の2バイト文字を全て返す。
-			/// </summary>
-			/// <returns>SJIS(CP-932)の2バイト文字のバイト列</returns>
-			public static IEnumerable<byte> GetJCharBytes()
-			{
-				foreach (UInt16 chr in GetJCharCodes())
-				{
-					yield return (byte)(chr >> 8);
-					yield return (byte)(chr & 0xff);
-				}
-			}
-
-			/// <summary>
-			/// SJIS(CP-932)の2バイト文字を全て返す。
-			/// </summary>
-			/// <returns>SJIS(CP-932)の2バイト文字の列挙</returns>
-			public static IEnumerable<UInt16> GetJCharCodes()
-			{
-				for (UInt16 chr = S_JChar.CHR_MIN; chr <= S_JChar.CHR_MAX; chr++)
-					if (S_JChar.I.Contains(chr))
-						yield return chr;
-			}
-
-			private class S_JChar
-			{
-				private static S_JChar _i = null;
-
-				public static S_JChar I
-				{
-					get
-					{
-						if (_i == null)
-							_i = new S_JChar();
-
-						return _i;
-					}
-				}
-
-				private UInt64[] ChrMap = new UInt64[0x10000 / 64];
-
-				private S_JChar()
-				{
-					this.Add();
-				}
-
-				public const UInt16 CHR_MIN = 0x8140;
-				public const UInt16 CHR_MAX = 0xfc4b;
-
-				#region Add Method
-
-				/// <summary>
-				/// generated by https://github.com/stackprobe/Factory/blob/master/Labo/GenData/IsJChar.c
-				/// </summary>
-				private void Add()
-				{
-					this.Add(0x8140, 0x817e);
-					this.Add(0x8180, 0x81ac);
-					this.Add(0x81b8, 0x81bf);
-					this.Add(0x81c8, 0x81ce);
-					this.Add(0x81da, 0x81e8);
-					this.Add(0x81f0, 0x81f7);
-					this.Add(0x81fc, 0x81fc);
-					this.Add(0x824f, 0x8258);
-					this.Add(0x8260, 0x8279);
-					this.Add(0x8281, 0x829a);
-					this.Add(0x829f, 0x82f1);
-					this.Add(0x8340, 0x837e);
-					this.Add(0x8380, 0x8396);
-					this.Add(0x839f, 0x83b6);
-					this.Add(0x83bf, 0x83d6);
-					this.Add(0x8440, 0x8460);
-					this.Add(0x8470, 0x847e);
-					this.Add(0x8480, 0x8491);
-					this.Add(0x849f, 0x84be);
-					this.Add(0x8740, 0x875d);
-					this.Add(0x875f, 0x8775);
-					this.Add(0x877e, 0x877e);
-					this.Add(0x8780, 0x879c);
-					this.Add(0x889f, 0x88fc);
-					this.Add(0x8940, 0x897e);
-					this.Add(0x8980, 0x89fc);
-					this.Add(0x8a40, 0x8a7e);
-					this.Add(0x8a80, 0x8afc);
-					this.Add(0x8b40, 0x8b7e);
-					this.Add(0x8b80, 0x8bfc);
-					this.Add(0x8c40, 0x8c7e);
-					this.Add(0x8c80, 0x8cfc);
-					this.Add(0x8d40, 0x8d7e);
-					this.Add(0x8d80, 0x8dfc);
-					this.Add(0x8e40, 0x8e7e);
-					this.Add(0x8e80, 0x8efc);
-					this.Add(0x8f40, 0x8f7e);
-					this.Add(0x8f80, 0x8ffc);
-					this.Add(0x9040, 0x907e);
-					this.Add(0x9080, 0x90fc);
-					this.Add(0x9140, 0x917e);
-					this.Add(0x9180, 0x91fc);
-					this.Add(0x9240, 0x927e);
-					this.Add(0x9280, 0x92fc);
-					this.Add(0x9340, 0x937e);
-					this.Add(0x9380, 0x93fc);
-					this.Add(0x9440, 0x947e);
-					this.Add(0x9480, 0x94fc);
-					this.Add(0x9540, 0x957e);
-					this.Add(0x9580, 0x95fc);
-					this.Add(0x9640, 0x967e);
-					this.Add(0x9680, 0x96fc);
-					this.Add(0x9740, 0x977e);
-					this.Add(0x9780, 0x97fc);
-					this.Add(0x9840, 0x9872);
-					this.Add(0x989f, 0x98fc);
-					this.Add(0x9940, 0x997e);
-					this.Add(0x9980, 0x99fc);
-					this.Add(0x9a40, 0x9a7e);
-					this.Add(0x9a80, 0x9afc);
-					this.Add(0x9b40, 0x9b7e);
-					this.Add(0x9b80, 0x9bfc);
-					this.Add(0x9c40, 0x9c7e);
-					this.Add(0x9c80, 0x9cfc);
-					this.Add(0x9d40, 0x9d7e);
-					this.Add(0x9d80, 0x9dfc);
-					this.Add(0x9e40, 0x9e7e);
-					this.Add(0x9e80, 0x9efc);
-					this.Add(0x9f40, 0x9f7e);
-					this.Add(0x9f80, 0x9ffc);
-					this.Add(0xe040, 0xe07e);
-					this.Add(0xe080, 0xe0fc);
-					this.Add(0xe140, 0xe17e);
-					this.Add(0xe180, 0xe1fc);
-					this.Add(0xe240, 0xe27e);
-					this.Add(0xe280, 0xe2fc);
-					this.Add(0xe340, 0xe37e);
-					this.Add(0xe380, 0xe3fc);
-					this.Add(0xe440, 0xe47e);
-					this.Add(0xe480, 0xe4fc);
-					this.Add(0xe540, 0xe57e);
-					this.Add(0xe580, 0xe5fc);
-					this.Add(0xe640, 0xe67e);
-					this.Add(0xe680, 0xe6fc);
-					this.Add(0xe740, 0xe77e);
-					this.Add(0xe780, 0xe7fc);
-					this.Add(0xe840, 0xe87e);
-					this.Add(0xe880, 0xe8fc);
-					this.Add(0xe940, 0xe97e);
-					this.Add(0xe980, 0xe9fc);
-					this.Add(0xea40, 0xea7e);
-					this.Add(0xea80, 0xeaa4);
-					this.Add(0xed40, 0xed7e);
-					this.Add(0xed80, 0xedfc);
-					this.Add(0xee40, 0xee7e);
-					this.Add(0xee80, 0xeeec);
-					this.Add(0xeeef, 0xeefc);
-					this.Add(0xfa40, 0xfa7e);
-					this.Add(0xfa80, 0xfafc);
-					this.Add(0xfb40, 0xfb7e);
-					this.Add(0xfb80, 0xfbfc);
-					this.Add(0xfc40, 0xfc4b);
-				}
-
-				#endregion
-
-				private void Add(UInt16 bgn, UInt16 end)
-				{
-					for (UInt16 chr = bgn; chr <= end; chr++)
-					{
-						this.Add(chr);
-					}
-				}
-
-				private void Add(UInt16 chr)
-				{
-					this.ChrMap[chr / 64] |= (UInt64)1 << (chr % 64);
-				}
-
-				public bool Contains(byte lead, byte trail)
-				{
-					UInt16 chr = lead;
-
-					chr <<= 8;
-					chr |= trail;
-
-					return Contains(chr);
-				}
-
-				public bool Contains(UInt16 chr)
-				{
-					return (this.ChrMap[chr / 64] & (UInt64)1 << (chr % 64)) != (UInt64)0;
-				}
-			}
-
-			private static Encoding _i_ENCODING_SJIS = null;
-
-			public static Encoding ENCODING_SJIS
-			{
-				get
-				{
-					if (_i_ENCODING_SJIS == null)
-					{
-						Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-						_i_ENCODING_SJIS = Encoding.GetEncoding(932);
-					}
-					return _i_ENCODING_SJIS;
-				}
-			}
-
-			public static string PUNCT =
-				S_GetString_SJISHalfCodeRange(0x21, 0x2f) +
-				S_GetString_SJISHalfCodeRange(0x3a, 0x40) +
-				S_GetString_SJISHalfCodeRange(0x5b, 0x60) +
-				S_GetString_SJISHalfCodeRange(0x7b, 0x7e);
-
-			private static string S_GetString_SJISHalfCodeRange(int codeMin, int codeMax)
-			{
-				byte[] buff = new byte[codeMax - codeMin + 1];
-
-				for (int code = codeMin; code <= codeMax; code++)
-				{
-					buff[code - codeMin] = (byte)code;
-				}
-				return ENCODING_SJIS.GetString(buff);
-			}
-
-			public static string MBC_PUNCT =
-				S_GetString_SJISCodeRange(0x81, 0x41, 0x7e) +
-				S_GetString_SJISCodeRange(0x81, 0x80, 0xac) +
-				S_GetString_SJISCodeRange(0x81, 0xb8, 0xbf) + // 集合
-				S_GetString_SJISCodeRange(0x81, 0xc8, 0xce) + // 論理
-				S_GetString_SJISCodeRange(0x81, 0xda, 0xe8) + // 数学
-				S_GetString_SJISCodeRange(0x81, 0xf0, 0xf7) +
-				S_GetString_SJISCodeRange(0x81, 0xfc, 0xfc) +
-				S_GetString_SJISCodeRange(0x83, 0x9f, 0xb6) + // ギリシャ語大文字
-				S_GetString_SJISCodeRange(0x83, 0xbf, 0xd6) + // ギリシャ語小文字
-				S_GetString_SJISCodeRange(0x84, 0x40, 0x60) + // キリル文字大文字
-				S_GetString_SJISCodeRange(0x84, 0x70, 0x7e) + // キリル文字小文字(1)
-				S_GetString_SJISCodeRange(0x84, 0x80, 0x91) + // キリル文字小文字(2)
-				S_GetString_SJISCodeRange(0x84, 0x9f, 0xbe) + // 枠線
-				S_GetString_SJISCodeRange(0x87, 0x40, 0x5d) + // 機種依存文字(1)
-				S_GetString_SJISCodeRange(0x87, 0x5f, 0x75) + // 機種依存文字(2)
-				S_GetString_SJISCodeRange(0x87, 0x7e, 0x7e) + // 機種依存文字(3)
-				S_GetString_SJISCodeRange(0x87, 0x80, 0x9c) + // 機種依存文字(4)
-				S_GetString_SJISCodeRange(0xee, 0xef, 0xfc); // 機種依存文字(5)
-
-			public static string MBC_CHOUONPU = S_GetString_SJISCodeRange(0x81, 0x5b, 0x5b); // 815b == 長音符 -- ひらがなとカタカナの長音符は同じ文字
-
-			public static string MBC_KANA =
-				S_GetString_SJISCodeRange(0x83, 0x40, 0x7e) +
-				S_GetString_SJISCodeRange(0x83, 0x80, 0x96) + MBC_CHOUONPU;
-
-			private static string S_GetString_SJISCodeRange(int lead, int trailMin, int trailMax)
-			{
-				byte[] buff = new byte[(trailMax - trailMin + 1) * 2];
-
-				for (int trail = trailMin; trail <= trailMax; trail++)
-				{
-					buff[(trail - trailMin) * 2 + 0] = (byte)lead;
-					buff[(trail - trailMin) * 2 + 1] = (byte)trail;
-				}
-				return ENCODING_SJIS.GetString(buff);
-			}
-
-			public class IECompStringIgnoreCase : IEqualityComparer<string>
-			{
-				public bool Equals(string a, string b)
-				{
-					return a.ToLower() == b.ToLower();
-				}
-
-				public int GetHashCode(string a)
-				{
-					return a.ToLower().GetHashCode();
-				}
-			}
-
-			public static bool EqualsIgnoreCase(string a, string b)
+		public class IECompStringIgnoreCase : IEqualityComparer<string>
+		{
+			public bool Equals(string a, string b)
 			{
 				return a.ToLower() == b.ToLower();
 			}
 
-			public static bool ContainsIgnoreCase(string str, string ptn)
+			public int GetHashCode(string a)
 			{
-				return str.ToLower().Contains(ptn.ToLower());
+				return a.ToLower().GetHashCode();
 			}
-
-			#region TimeStampToSec
-
-			/// <summary>
-			/// 日時を 1/1/1 00:00:00 からの経過秒数に変換およびその逆を行います。
-			/// 日時のフォーマット
-			/// -- YMMDDhhmmss
-			/// -- YYMMDDhhmmss
-			/// -- YYYMMDDhhmmss
-			/// -- YYYYMMDDhhmmss
-			/// -- YYYYYMMDDhhmmss
-			/// -- YYYYYYMMDDhhmmss
-			/// -- YYYYYYYMMDDhhmmss
-			/// -- YYYYYYYYMMDDhhmmss
-			/// -- YYYYYYYYYMMDDhhmmss -- 但し YYYYYYYYY == 100000000 ～ 922337203
-			/// ---- 年の桁数は 1 ～ 9 桁
-			/// 日時の範囲
-			/// -- 最小 1/1/1 00:00:00
-			/// -- 最大 922337203/12/31 23:59:59
-			/// </summary>
-			public static class TimeStampToSec
-			{
-				private const int YEAR_MIN = 1;
-				private const int YEAR_MAX = 922337203;
-
-				private const long TIME_STAMP_MIN = 10101000000L;
-				private const long TIME_STAMP_MAX = 9223372031231235959L;
-
-				public static long ToSec(long timeStamp)
-				{
-					if (timeStamp < TIME_STAMP_MIN || TIME_STAMP_MAX < timeStamp)
-						return 0L;
-
-					int s = (int)(timeStamp % 100L);
-					timeStamp /= 100L;
-					int i = (int)(timeStamp % 100L);
-					timeStamp /= 100L;
-					int h = (int)(timeStamp % 100L);
-					timeStamp /= 100L;
-					int d = (int)(timeStamp % 100L);
-					timeStamp /= 100L;
-					int m = (int)(timeStamp % 100L);
-					int y = (int)(timeStamp / 100L);
-
-					if (
-						//y < YEAR_MIN || YEAR_MAX < y ||
-						m < 1 || 12 < m ||
-						d < 1 || 31 < d ||
-						h < 0 || 23 < h ||
-						i < 0 || 59 < i ||
-						s < 0 || 59 < s
-						)
-						return 0L;
-
-					if (m <= 2)
-						y--;
-
-					long ret = y / 400;
-					ret *= 365 * 400 + 97;
-
-					y %= 400;
-
-					ret += y * 365;
-					ret += y / 4;
-					ret -= y / 100;
-
-					if (2 < m)
-					{
-						ret -= 31 * 10 - 4;
-						m -= 3;
-						ret += (m / 5) * (31 * 5 - 2);
-						m %= 5;
-						ret += (m / 2) * (31 * 2 - 1);
-						m %= 2;
-						ret += m * 31;
-					}
-					else
-						ret += (m - 1) * 31;
-
-					ret += d - 1;
-					ret *= 24;
-					ret += h;
-					ret *= 60;
-					ret += i;
-					ret *= 60;
-					ret += s;
-
-					return ret;
-				}
-
-				public static long ToTimeStamp(long sec)
-				{
-					if (sec < 0L)
-						return TIME_STAMP_MIN;
-
-					int s = (int)(sec % 60L);
-					sec /= 60L;
-					int i = (int)(sec % 60L);
-					sec /= 60L;
-					int h = (int)(sec % 24L);
-					sec /= 24L;
-
-					int day = (int)(sec % 146097);
-					sec /= 146097;
-					sec *= 400;
-					sec++;
-
-					if (YEAR_MAX < sec)
-						return TIME_STAMP_MAX;
-
-					int y = (int)sec;
-					int m = 1;
-					int d;
-
-					day += Math.Min((day + 306) / 36524, 3);
-					y += (day / 1461) * 4;
-					day %= 1461;
-
-					day += Math.Min((day + 306) / 365, 3);
-					y += day / 366;
-					day %= 366;
-
-					if (60 <= day)
-					{
-						m += 2;
-						day -= 60;
-						m += (day / 153) * 5;
-						day %= 153;
-						m += (day / 61) * 2;
-						day %= 61;
-					}
-					m += day / 31;
-					day %= 31;
-					d = day + 1;
-
-					if (y < YEAR_MIN)
-						return TIME_STAMP_MIN;
-
-					if (YEAR_MAX < y)
-						return TIME_STAMP_MAX;
-
-					if (
-						//y < YEAR_MIN || YEAR_MAX < y ||
-						m < 1 || 12 < m ||
-						d < 1 || 31 < d ||
-						h < 0 || 23 < h ||
-						m < 0 || 59 < m ||
-						s < 0 || 59 < s
-						)
-						throw null; // never
-
-					return
-						y * 10000000000L +
-						m * 100000000L +
-						d * 1000000L +
-						h * 10000L +
-						i * 100L +
-						s;
-				}
-
-				public static long ToSec(DateTime dateTime)
-				{
-					return ToSec(ToTimeStamp(dateTime));
-				}
-
-				public static long ToTimeStamp(DateTime dateTime)
-				{
-					return
-						10000000000L * dateTime.Year +
-						100000000L * dateTime.Month +
-						1000000L * dateTime.Day +
-						10000L * dateTime.Hour +
-						100L * dateTime.Minute +
-						dateTime.Second;
-				}
-			}
-
-			#endregion
-
-			#region SimpleDateTime
-
-			/// <summary>
-			/// 日時の範囲：1/1/1 00:00:00 ～ 922337203/12/31 23:59:59
-			/// </summary>
-			public struct SimpleDateTime
-			{
-				public readonly int Year;
-				public readonly int Month;
-				public readonly int Day;
-				public readonly int Hour;
-				public readonly int Minute;
-				public readonly int Second;
-				public readonly string Weekday;
-
-				public static SimpleDateTime Now()
-				{
-					return new SimpleDateTime(DateTime.Now);
-				}
-
-				public static SimpleDateTime FromTimeStamp(long timeStamp)
-				{
-					return new SimpleDateTime(TimeStampToSec.ToSec(timeStamp));
-				}
-
-				public SimpleDateTime(DateTime dateTime)
-					: this(TimeStampToSec.ToSec(dateTime))
-				{ }
-
-				public SimpleDateTime(long sec)
-				{
-					long timeStamp = TimeStampToSec.ToTimeStamp(sec);
-					long t = timeStamp;
-
-					this.Second = (int)(t % 100L);
-					t /= 100L;
-					this.Minute = (int)(t % 100L);
-					t /= 100L;
-					this.Hour = (int)(t % 100L);
-					t /= 100L;
-					this.Day = (int)(t % 100L);
-					t /= 100L;
-					this.Month = (int)(t % 100L);
-					this.Year = (int)(t / 100L);
-
-					this.Weekday = new string(new char[] { "月火水木金土日"[(int)(TimeStampToSec.ToSec(timeStamp) / 86400 % 7)] });
-				}
-
-				public override string ToString()
-				{
-					return this.ToString("{0}/{1:D2}/{2:D2} ({3}) {4:D2}:{5:D2}:{6:D2}");
-				}
-
-				public string ToString(string format)
-				{
-					return string.Format(format, this.Year, this.Month, this.Day, this.Weekday, this.Hour, this.Minute, this.Second);
-				}
-
-				public DateTime ToDateTime()
-				{
-					return new DateTime(this.Year, this.Month, this.Day, this.Hour, this.Minute, this.Second);
-				}
-
-				public long ToTimeStamp()
-				{
-					return
-						10000000000L * this.Year +
-						100000000L * this.Month +
-						1000000L * this.Day +
-						10000L * this.Hour +
-						100L * this.Minute +
-						this.Second;
-				}
-
-				public long ToSec()
-				{
-					return TimeStampToSec.ToSec(this.ToTimeStamp());
-				}
-
-				public static SimpleDateTime operator +(SimpleDateTime instance, long sec)
-				{
-					return new SimpleDateTime(instance.ToSec() + sec);
-				}
-
-				public static SimpleDateTime operator +(long sec, SimpleDateTime instance)
-				{
-					return new SimpleDateTime(instance.ToSec() + sec);
-				}
-
-				public static SimpleDateTime operator -(SimpleDateTime instance, long sec)
-				{
-					return new SimpleDateTime(instance.ToSec() - sec);
-				}
-
-				public static long operator -(SimpleDateTime a, SimpleDateTime b)
-				{
-					return a.ToSec() - b.ToSec();
-				}
-
-				private long GetValueForCompare()
-				{
-					return this.ToTimeStamp();
-				}
-
-				public static bool operator ==(SimpleDateTime a, SimpleDateTime b)
-				{
-					return a.GetValueForCompare() == b.GetValueForCompare();
-				}
-
-				public static bool operator !=(SimpleDateTime a, SimpleDateTime b)
-				{
-					return a.GetValueForCompare() != b.GetValueForCompare();
-				}
-
-				public override bool Equals(object other)
-				{
-					return other is SimpleDateTime && this == (SimpleDateTime)other;
-				}
-
-				public override int GetHashCode()
-				{
-					return this.GetValueForCompare().GetHashCode();
-				}
-
-				public static bool operator <(SimpleDateTime a, SimpleDateTime b)
-				{
-					return a.GetValueForCompare() < b.GetValueForCompare();
-				}
-
-				public static bool operator >(SimpleDateTime a, SimpleDateTime b)
-				{
-					return a.GetValueForCompare() > b.GetValueForCompare();
-				}
-
-				public static bool operator <=(SimpleDateTime a, SimpleDateTime b)
-				{
-					return a.GetValueForCompare() <= b.GetValueForCompare();
-				}
-
-				public static bool operator >=(SimpleDateTime a, SimpleDateTime b)
-				{
-					return a.GetValueForCompare() >= b.GetValueForCompare();
-				}
-			}
-
-			#endregion
 		}
 
-		public class WorkingDir : IDisposable
+		public static bool EqualsIgnoreCase(string a, string b)
 		{
-			public static RootInfo Root = null;
+			return a.ToLower() == b.ToLower();
+		}
 
-			public class RootInfo
-			{
-				private string Dir;
-				private bool Created = false;
+		public static bool ContainsIgnoreCase(string str, string ptn)
+		{
+			return str.ToLower().Contains(ptn.ToLower());
+		}
 
-				public RootInfo(string dir)
-				{
-					this.Dir = dir;
-				}
+		public static char SJISHanKanaToUnicode(byte chr)
+		{
+			return (char)((int)chr + 65216);
+		}
 
-				public string GetDir()
-				{
-					if (!this.Created)
-					{
-						SCommon.DeletePath(this.Dir);
-						SCommon.CreateDir(this.Dir);
-
-						this.Created = true;
-					}
-					return this.Dir;
-				}
-
-				public void Delete()
-				{
-					if (this.Created)
-					{
-						SCommon.DeletePath(this.Dir);
-
-						this.Created = false;
-					}
-				}
-			}
-
-			private static long CtorCounter = 0L;
-
-			private string Dir = null;
-
-			private string GetDir()
-			{
-				if (this.Dir == null)
-				{
-					if (Root == null)
-						throw new Exception("Root is null");
-
-					//this.Dir = Path.Combine(Root.GetDir(), Guid.NewGuid().ToString("B"));
-					//this.Dir = Path.Combine(Root.GetDir(), SecurityTools.MakePassword_9A());
-					this.Dir = Path.Combine(Root.GetDir(), "$" + CtorCounter++);
-
-					SCommon.CreateDir(this.Dir);
-				}
-				return this.Dir;
-			}
-
-			public string GetPath(string localName)
-			{
-				return Path.Combine(this.GetDir(), localName);
-			}
-
-			private long PathCounter = 0L;
-
-			public string MakePath()
-			{
-				//return this.GetPath(Guid.NewGuid().ToString("B"));
-				//return this.GetPath(SecurityTools.MakePassword_9A());
-				return this.GetPath("$" + this.PathCounter++);
-			}
-
-			public void Dispose()
-			{
-				if (this.Dir != null)
-				{
-					try
-					{
-						Directory.Delete(this.Dir, true);
-					}
-					catch (Exception e)
-					{
-						ProcMain.WriteLog(e);
-					}
-
-					this.Dir = null;
-				}
-			}
+		public static IEnumerable<char> GetUnicodeListOfSJISMBC()
+		{
+			throw null; // TODO
 		}
 
 		public static class ProcMain
