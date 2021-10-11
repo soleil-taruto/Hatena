@@ -13,6 +13,11 @@ namespace SimpleWebServer
 	public class SimpleWebServer
 	{
 		/// <summary>
+		/// ドキュメントルート
+		/// </summary>
+		public string DocRoot = @"C:\www\DocRoot";
+
+		/// <summary>
 		/// ポート番号
 		/// </summary>
 		public int PortNo = 80;
@@ -24,7 +29,61 @@ namespace SimpleWebServer
 		/// </summary>
 		public Func<bool> Interlude = () => !Console.KeyAvailable;
 
-		// <---- prm
+		// インスタンスの設定ここまで
+
+		/// <summary>
+		/// Keep-Alive-タイムアウト_ミリ秒
+		/// -1 == INFINITE
+		/// </summary>
+		public static int KeepAliveTimeoutMillis = 5000;
+
+		/// <summary>
+		/// 要求タイムアウト_ミリ秒
+		/// -1 == INFINITE
+		/// </summary>
+		public static int RequestTimeoutMillis = -1;
+
+		/// <summary>
+		/// 応答タイムアウト_ミリ秒
+		/// -1 == INFINITE
+		/// </summary>
+		public static int ResponseTimeoutMillis = -1;
+
+		/// <summary>
+		/// リクエストの最初の行のみの無通信タイムアウト_ミリ秒
+		/// -1 == INFINITE
+		/// </summary>
+		public static int FirstLineTimeoutMillis = 2000;
+
+		/// <summary>
+		/// リクエストの最初の行以外の(レスポンスも含む)無通信タイムアウト_ミリ秒
+		/// -1 == INFINITE
+		/// </summary>
+		public static int IdleTimeoutMillis = 600000;
+
+		/// <summary>
+		/// スレッド占用タイムアウト_ミリ秒
+		/// -1 == INFINITE
+		/// </summary>
+		public static int ThreadTimeoutMillis = 100;
+
+		/// <summary>
+		/// リクエストのボディの最大サイズ_バイト数
+		/// -1 == INFINITE
+		/// </summary>
+		public static int BodySizeMax = 300000000;
+
+		/// <summary>
+		/// 接続待ちキューの長さ
+		/// </summary>
+		public static int Backlog = 300;
+
+		/// <summary>
+		/// 最大同時接続数
+		/// </summary>
+		public static int ConnectMax = 100;
+
+		// 全体の設定ここまで
 
 		public void Perform()
 		{
@@ -35,28 +94,53 @@ namespace SimpleWebServer
 			hs.Perform(this.PortNo, this.Interlude);
 		}
 
-		/// <summary>
-		/// ドキュメントルート
-		/// </summary>
-		public string DocRoot = @"C:\www\DocRoot";
-
 		private void P_Connected(HTTPServerChannel channel)
 		{
-			WriteLog("クライアント：" + channel.Channel.Handler.RemoteEndPoint);
+			WriteLog("Client: " + channel.Channel.Handler.RemoteEndPoint);
 
-			if (10 < channel.Method.Length) // ラフなしきい値
+			if (7 < channel.Method.Length) // ? 最も長いメソッドより長い。
 				throw new Exception("Received method is too long");
 
-			WriteLog("要求メソッド：" + channel.Method);
+			WriteLog("Method: " + channel.Method);
 
-			bool head;
-			if (channel.Method == "GET")
-				head = false;
-			else if (channel.Method == "HEAD")
-				head = true;
-			else
-				throw new Exception("Unsupported method: " + channel.Method);
+			switch (channel.Method)
+			{
+				case "GET":
+					this.GetOrHead(channel, false);
+					break;
 
+				case "HEAD":
+					this.GetOrHead(channel, true);
+					break;
+
+				case "POST":
+					throw new Exception("Unsupported method");
+
+				case "PUT":
+					throw new Exception("Unsupported method");
+
+				case "DELETE":
+					throw new Exception("Unsupported method");
+
+				case "CONNECT":
+					throw new Exception("Unsupported method");
+
+				case "OPTIONS":
+					throw new Exception("Unsupported method");
+
+				case "TRACE":
+					throw new Exception("Unsupported method");
+
+				case "PATCH":
+					throw new Exception("Unsupported method");
+
+				default:
+					throw new Exception("Unknown method");
+			}
+		}
+
+		private void GetOrHead(HTTPServerChannel channel, bool head)
+		{
 			string urlPath = channel.PathQuery;
 
 			// クエリ除去
@@ -70,12 +154,12 @@ namespace SimpleWebServer
 			if (1000 < urlPath.Length) // ラフなしきい値
 				throw new Exception("Received path is too long");
 
-			WriteLog("要求パス：" + urlPath);
+			WriteLog("URL-Path：" + urlPath);
 
 			string[] pTkns = urlPath.Split('/').Where(v => v != "").Select(v => ToFairLocalPath(v, 0)).ToArray();
 			string path = Path.Combine(new string[] { this.DocRoot }.Concat(pTkns).ToArray());
 
-			WriteLog("目的パス：" + path);
+			WriteLog("RealPath：" + path);
 
 			if (urlPath.EndsWith("/"))
 			{
@@ -106,7 +190,7 @@ namespace SimpleWebServer
 			}
 
 		endFunc:
-			channel.ResHeaderPairs.Add(new string[] { "Server", "SimpleWebServer" });
+			channel.ResHeaderPairs.Add(new string[] { "Server", "sws" });
 
 			if (head && channel.ResBody != null)
 			{
@@ -118,12 +202,12 @@ namespace SimpleWebServer
 				channel.ResBody = null;
 			}
 
-			WriteLog("RES-STATUS " + channel.ResStatus);
+			WriteLog("Res-Status: " + channel.ResStatus);
 
 			foreach (string[] pair in channel.ResHeaderPairs)
-				WriteLog("RES-HEADER " + pair[0] + " = " + pair[1]);
+				WriteLog("Res-Header: " + pair[0] + " = " + pair[1]);
 
-			WriteLog("RES-BODY " + (channel.ResBody != null));
+			WriteLog("Res-Body: " + (channel.ResBody != null));
 		}
 
 		private static string GetHeaderValue(HTTPServerChannel channel, string name)
@@ -156,7 +240,7 @@ namespace SimpleWebServer
 				int readSize = (int)Math.Min(fileSize - offset, 2000000L);
 				byte[] buff = new byte[readSize];
 
-				WriteLog("READ " + offset + " " + readSize + " " + fileSize + " " + (offset * 100.0 / fileSize).ToString("F2") + " " + ((offset + readSize) * 100.0 / fileSize).ToString("F2"));
+				WriteLog("Read: " + offset + " " + readSize + " " + fileSize + " " + (offset * 100.0 / fileSize).ToString("F2") + " " + ((offset + readSize) * 100.0 / fileSize).ToString("F2"));
 
 				using (FileStream reader = new FileStream(file, FileMode.Open, FileAccess.Read))
 				{
@@ -169,7 +253,7 @@ namespace SimpleWebServer
 			}
 		}
 
-		public class ContentTypeCollection
+		private class ContentTypeCollection
 		{
 			private static ContentTypeCollection _i = null;
 
@@ -412,7 +496,7 @@ namespace SimpleWebServer
 			}
 		}
 
-		public class HTTPServer : SockServer
+		private class HTTPServer : SockServer
 		{
 			/// <summary>
 			/// サーバーロジック
@@ -420,14 +504,6 @@ namespace SimpleWebServer
 			/// -- channel: 接続チャネル
 			/// </summary>
 			public Action<HTTPServerChannel> HTTPConnected = channel => { };
-
-			// <---- prm
-
-			/// <summary>
-			/// Keep-Alive-タイムアウト_ミリ秒
-			/// -1 == INFINITE
-			/// </summary>
-			public static int KeepAliveTimeoutMillis = 5000;
 
 			protected override IEnumerable<int> E_Connected(SockChannel channel)
 			{
@@ -481,53 +557,17 @@ namespace SimpleWebServer
 			}
 		}
 
-		public class HTTPServerChannel
+		private class HTTPServerChannel
 		{
 			public SockChannel Channel;
-
-			/// <summary>
-			/// 要求タイムアウト_ミリ秒
-			/// -1 == INFINITE
-			/// </summary>
-			public static int RequestTimeoutMillis = -1;
-
-			/// <summary>
-			/// 応答タイムアウト_ミリ秒
-			/// -1 == INFINITE
-			/// </summary>
-			public static int ResponseTimeoutMillis = -1;
-
-			// memo: チャンク毎のタイムアウトは IdleTimeoutMillis で代替する。
-
-			/// <summary>
-			/// リクエストの最初の行のみの無通信タイムアウト_ミリ秒
-			/// -1 == INFINITE
-			/// </summary>
-			public static int FirstLineTimeoutMillis = 2000;
-
-			/// <summary>
-			/// リクエストの最初の行以外の(レスポンスも含む)無通信タイムアウト_ミリ秒
-			/// -1 == INFINITE
-			/// </summary>
-			public static int IdleTimeoutMillis = 600000;
-
-			/// <summary>
-			/// リクエストのボディの最大サイズ_バイト数
-			/// -1 == INFINITE
-			/// </summary>
-			public static int BodySizeMax = 300000000;
 
 			public IEnumerable<int> RecvRequest()
 			{
 				this.Channel.SessionTimeoutTime = TimeoutMillisToDateTime(RequestTimeoutMillis);
 				this.Channel.IdleTimeoutMillis = FirstLineTimeoutMillis;
 
-				this.Channel.FirstLineRecving = true;
-
 				foreach (int relay in this.RecvLine(ret => this.FirstLine = ret))
 					yield return relay;
-
-				this.Channel.FirstLineRecving = false;
 
 				{
 					string[] tokens = this.FirstLine.Split(' ');
@@ -765,10 +805,10 @@ namespace SimpleWebServer
 							break;
 
 						if (size < 0)
-							throw new Exception("不正なチャンクサイズです。" + size);
+							throw new Exception("Bad chunk-size: " + size);
 
 						if (BodySizeMax != -1 && BodySizeMax - buff.Count < size)
-							throw new Exception("ボディサイズが大きすぎます。" + buff.Count + " + " + size);
+							throw new Exception("Chunk is too big: " + buff.Count + " + " + size);
 
 						int chunkEnd = buff.Count + size;
 
@@ -805,10 +845,10 @@ namespace SimpleWebServer
 				else
 				{
 					if (this.ContentLength < 0)
-						throw new Exception("不正なボディサイズです。" + this.ContentLength);
+						throw new Exception("Bad Content-Length: " + this.ContentLength);
 
 					if (BodySizeMax != -1 && BodySizeMax < this.ContentLength)
-						throw new Exception("ボディサイズが大きすぎます。" + this.ContentLength);
+						throw new Exception("Body is too big: " + this.ContentLength);
 
 					while (buff.Count < this.ContentLength)
 					{
@@ -916,11 +956,12 @@ namespace SimpleWebServer
 			}
 		}
 
-		public class HTTPBodyOutputStream : IDisposable
+		private class HTTPBodyOutputStream : IDisposable
 		{
+#if true
 			public void Write(byte[] data)
 			{
-				throw new Exception("REJECT-BODY");
+				throw new Exception("Request-Body is not supported");
 			}
 
 			public int Count
@@ -940,20 +981,63 @@ namespace SimpleWebServer
 			{
 				// noop
 			}
+#else
+			private static long Counter = 0L;
+			private string BuffFile;
+			private int Size = 0;
+
+			public HTTPBodyOutputStream()
+			{
+				this.BuffFile = Path.Combine(@"C:\temp", (Counter++) + ".tmp");
+				File.WriteAllBytes(this.BuffFile, new byte[0]);
+			}
+
+			public void Write(byte[] data)
+			{
+				using (FileStream writer = new FileStream(this.BuffFile, FileMode.Append, FileAccess.Write))
+				{
+					writer.Write(data, 0, data.Length);
+				}
+				this.Size += data.Length;
+			}
+
+			public int Count
+			{
+				get
+				{
+					return this.Size;
+				}
+			}
+
+			public byte[] ToByteArray()
+			{
+				byte[] data = File.ReadAllBytes(this.BuffFile);
+
+				File.WriteAllBytes(this.BuffFile, new byte[0]);
+				this.Size = 0;
+
+				return data;
+			}
+
+			public void Dispose()
+			{
+				if (this.BuffFile != null)
+				{
+					try
+					{
+						File.Delete(this.BuffFile);
+					}
+					catch
+					{ }
+
+					this.BuffFile = null;
+				}
+			}
+#endif
 		}
 
-		public abstract class SockServer
+		private abstract class SockServer
 		{
-			/// <summary>
-			/// 接続待ちキューの長さ
-			/// </summary>
-			public static int Backlog = 300;
-
-			/// <summary>
-			/// 最大同時接続数
-			/// </summary>
-			public static int ConnectMax = 100;
-
 			/// <summary>
 			/// サーバーロジック
 			/// 通信量：
@@ -969,7 +1053,7 @@ namespace SimpleWebServer
 
 			public void Perform(int portNo, Func<bool> interlude)
 			{
-				WriteLog("サーバーを開始しています...");
+				WriteLog("SERVER STARTING...");
 
 				try
 				{
@@ -981,7 +1065,7 @@ namespace SimpleWebServer
 						listener.Listen(Backlog);
 						listener.Blocking = false;
 
-						WriteLog("サーバーを開始しました。");
+						WriteLog("SERVER STARTED!");
 
 						int waitMillis = 0;
 
@@ -1052,7 +1136,7 @@ namespace SimpleWebServer
 								Thread.Sleep(waitMillis);
 						}
 
-						WriteLog("サーバーを終了しています...");
+						WriteLog("SERVER ENDING...");
 
 						this.Stop();
 					}
@@ -1062,7 +1146,7 @@ namespace SimpleWebServer
 					WriteLog(e);
 				}
 
-				WriteLog("サーバーを終了しました。");
+				WriteLog("SERVER ENDED!");
 			}
 
 			private Socket Connect(Socket listener) // ret: null == 接続タイムアウト
@@ -1075,7 +1159,7 @@ namespace SimpleWebServer
 				{
 					if (e.ErrorCode != 10035)
 					{
-						throw new Exception("接続エラー", e);
+						throw new Exception("Connection error", e);
 					}
 					return null;
 				}
@@ -1115,16 +1199,12 @@ namespace SimpleWebServer
 			}
 		}
 
-		public class SockChannel
+		private class SockChannel
 		{
 			public Socket Handler;
 			public int ID;
 			public Func<int> Connected;
 			public HTTPBodyOutputStream BodyOutputStream;
-
-			// <---- prm
-
-			public bool FirstLineRecving = false;
 
 			/// <summary>
 			/// セッションタイムアウト日時
@@ -1139,12 +1219,6 @@ namespace SimpleWebServer
 			public DateTime? ThreadTimeoutTime = null;
 
 			/// <summary>
-			/// スレッド占用タイムアウト_ミリ秒
-			/// -1 == INFINITE
-			/// </summary>
-			public static int ThreadTimeoutMillis = 100;
-
-			/// <summary>
 			/// 無通信タイムアウト_ミリ秒
 			/// -1 == INFINITE
 			/// </summary>
@@ -1154,7 +1228,7 @@ namespace SimpleWebServer
 			{
 				if (this.SessionTimeoutTime != null && this.SessionTimeoutTime.Value < DateTime.Now)
 				{
-					throw new Exception("セッション時間切れ");
+					throw new Exception("Session time-out");
 				}
 				if (this.ThreadTimeoutTime == null)
 				{
@@ -1163,7 +1237,7 @@ namespace SimpleWebServer
 				}
 				else if (this.ThreadTimeoutTime.Value < DateTime.Now)
 				{
-					WriteLog("スレッド占用タイムアウト");
+					WriteLog("Thread time-out");
 
 					this.ThreadTimeoutTime = null;
 					yield return -1;
@@ -1203,7 +1277,7 @@ namespace SimpleWebServer
 
 						if (recvSize <= 0)
 						{
-							throw new Exception("受信エラー(切断)");
+							throw new Exception("Receive error (disconnect)");
 						}
 						if (10.0 <= (DateTime.Now - startedTime).TotalSeconds) // 長い無通信時間をモニタする。
 						{
@@ -1216,12 +1290,12 @@ namespace SimpleWebServer
 					{
 						if (e.ErrorCode != 10035)
 						{
-							throw new Exception("受信エラー", e);
+							throw new Exception("Receive error", e);
 						}
 					}
 					if (this.IdleTimeoutMillis != -1 && this.IdleTimeoutMillis < (DateTime.Now - startedTime).TotalMilliseconds)
 					{
-						throw new Exception("受信の無通信タイムアウト");
+						throw new Exception("Receive error (idle time-out)");
 					}
 					this.ThreadTimeoutTime = null;
 					yield return -1;
@@ -1261,7 +1335,7 @@ namespace SimpleWebServer
 
 						if (sentSize <= 0)
 						{
-							throw new Exception("送信エラー(切断)");
+							throw new Exception("Send error (disconnect)");
 						}
 						if (10.0 <= (DateTime.Now - startedTime).TotalSeconds) // 長い無通信時間をモニタする。
 						{
@@ -1274,12 +1348,12 @@ namespace SimpleWebServer
 					{
 						if (e.ErrorCode != 10035)
 						{
-							throw new Exception("送信エラー", e);
+							throw new Exception("Send error", e);
 						}
 					}
 					if (this.IdleTimeoutMillis != -1 && this.IdleTimeoutMillis < (DateTime.Now - startedTime).TotalMilliseconds)
 					{
-						throw new Exception("送信の無通信タイムアウト");
+						throw new Exception("Send error (idle time-out)");
 					}
 					this.ThreadTimeoutTime = null;
 					yield return -1;
@@ -1288,9 +1362,9 @@ namespace SimpleWebServer
 			}
 		}
 
-		public static UTF8Check P_UTF8Check = new UTF8Check();
+		private static UTF8Check P_UTF8Check = new UTF8Check();
 
-		public class UTF8Check
+		private class UTF8Check
 		{
 			private object[] Home = CreateByteCodeBranchTable();
 
@@ -1357,7 +1431,7 @@ namespace SimpleWebServer
 			}
 		}
 
-		public static class IDIssuer
+		private static class IDIssuer
 		{
 			private static Queue<int> Stocks = new Queue<int>(Enumerable.Range(1, 9));
 			private static int Counter = 10;
@@ -1376,7 +1450,7 @@ namespace SimpleWebServer
 			}
 		}
 
-		public static class TimeWaitMonitor
+		private static class TimeWaitMonitor
 		{
 			// 参考値：
 			// 動的ポートの数 16384 (49152 ～ 65535), TIME_WAIT-タイムアウト 4 min (240 sec) の場合 (Windowsの既定値)
@@ -1478,7 +1552,7 @@ namespace SimpleWebServer
 		/// <param name="str">対象文字列(対象パス)</param>
 		/// <param name="dirSize">対象パスが存在するディレクトリのフルパスの長さ、考慮しない場合は 0 を指定すること。</param>
 		/// <returns>ローカル名</returns>
-		public static string ToFairLocalPath(string str, int dirSize)
+		private static string ToFairLocalPath(string str, int dirSize)
 		{
 			const int MY_PATH_MAX = 250;
 			const string NG_CHARS = "\"*/:<>?\\|";
@@ -1521,7 +1595,7 @@ namespace SimpleWebServer
 
 		#endregion
 
-		public static void WriteLog(object message)
+		private static void WriteLog(object message)
 		{
 			if (message is Exception)
 				message = ((Exception)message).Message;
@@ -1529,12 +1603,12 @@ namespace SimpleWebServer
 			Console.WriteLine("[" + DateTime.Now + "] " + message);
 		}
 
-		public static Dictionary<string, V> CreateDictionaryIgnoreCase<V>()
+		private static Dictionary<string, V> CreateDictionaryIgnoreCase<V>()
 		{
 			return new Dictionary<string, V>(new IECompStringIgnoreCase());
 		}
 
-		public static Func<T> Supplier<T>(IEnumerable<T> src)
+		private static Func<T> Supplier<T>(IEnumerable<T> src)
 		{
 			IEnumerator<T> reader = src.GetEnumerator();
 
@@ -1552,7 +1626,7 @@ namespace SimpleWebServer
 			};
 		}
 
-		public class IECompStringIgnoreCase : IEqualityComparer<string>
+		private class IECompStringIgnoreCase : IEqualityComparer<string>
 		{
 			public bool Equals(string a, string b)
 			{
@@ -1565,23 +1639,23 @@ namespace SimpleWebServer
 			}
 		}
 
-		public static bool EqualsIgnoreCase(string a, string b)
+		private static bool EqualsIgnoreCase(string a, string b)
 		{
 			return a.ToLower() == b.ToLower();
 		}
 
-		public static bool ContainsIgnoreCase(string str, string ptn)
+		private static bool ContainsIgnoreCase(string str, string ptn)
 		{
 			return str.ToLower().Contains(ptn.ToLower());
 		}
 
-		public static char SJISHanKanaToUnicode(byte chr)
+		private static char SJISHanKanaToUnicode(byte chr)
 		{
 			return (char)((int)chr + 65216);
 		}
 
 #if true
-		public static IEnumerable<char> GetUnicodeListOfSJISMBC()
+		private static IEnumerable<char> GetUnicodeListOfSJISMBC()
 		{
 			#region RANGES_RESOURCE
 
@@ -1739,7 +1813,7 @@ namespace SimpleWebServer
 			}
 		}
 #else
-		public static IEnumerable<char> GetUnicodeListOfSJISMBC()
+		private static IEnumerable<char> GetUnicodeListOfSJISMBC()
 		{
 			return P_GetUnicodeListOfSJISMBC().OrderBy(v => v).Distinct();
 		}
