@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace SimpleWebServer
+namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 {
 	public class SimpleWebServer
 	{
@@ -84,6 +84,34 @@ namespace SimpleWebServer
 		public static int ConnectMax = 100;
 
 		// 設定ここまで
+
+		public static void Run(string[] args)
+		{
+			try
+			{
+				SimpleWebServer sws = new SimpleWebServer();
+
+				if (1 <= args.Length)
+				{
+					sws.DocRoot = args[0];
+
+					if (2 <= args.Length)
+						sws.PortNo = int.Parse(args[1]);
+				}
+
+				if (!Directory.Exists(sws.DocRoot))
+					throw new Exception("ドキュメントルートは存在しません：" + sws.DocRoot);
+
+				if (sws.PortNo < 1 || 65535 < sws.PortNo)
+					throw new Exception("不正なポート番号です：" + sws.PortNo);
+
+				sws.Perform();
+			}
+			catch (Exception e)
+			{
+				WriteLog(e);
+			}
+		}
 
 		public void Perform()
 		{
