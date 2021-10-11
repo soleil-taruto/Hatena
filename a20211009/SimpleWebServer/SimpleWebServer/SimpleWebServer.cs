@@ -12,13 +12,27 @@ namespace SimpleWebServer
 {
 	public class SimpleWebServer
 	{
+		/// <summary>
+		/// ポート番号
+		/// </summary>
+		public int PortNo = 80;
+
+		/// <summary>
+		/// サーバー処理の合間に呼ばれる処理
+		/// 戻り値：
+		/// -- サーバーを継続するか
+		/// </summary>
+		public Func<bool> Interlude = () => !Console.KeyAvailable;
+
+		// <---- prm
+
 		public void Perform()
 		{
 			HTTPServer hs = new HTTPServer();
 
 			hs.HTTPConnected = this.P_Connected;
 
-			hs.Perform();
+			hs.Perform(this.PortNo, this.Interlude);
 		}
 
 		/// <summary>
@@ -92,7 +106,7 @@ namespace SimpleWebServer
 			}
 
 		endFunc:
-			channel.ResHeaderPairs.Add(new string[] { "Server", "HTTCmd" });
+			channel.ResHeaderPairs.Add(new string[] { "Server", "SimpleWebServer" });
 
 			if (head && channel.ResBody != null)
 			{
@@ -812,20 +826,16 @@ namespace SimpleWebServer
 				this.Body = buff.ToByteArray();
 			}
 
-			// HTTPConnected 内で(必要に応じて)設定しなければならないフィールド -->
-
 			public int ResStatus = 200;
 			public List<string[]> ResHeaderPairs = new List<string[]>();
 			public IEnumerable<byte[]> ResBody = null;
-
-			// <-- HTTPConnected 内で(必要に応じて)設定しなければならないフィールド
 
 			public IEnumerable<int> SendResponse()
 			{
 				this.Body = null;
 				this.Channel.SessionTimeoutTime = TimeoutMillisToDateTime(ResponseTimeoutMillis);
 
-				foreach (int relay in this.SendLine("HTTP/1.1 " + this.ResStatus + " Happy Tea Time"))
+				foreach (int relay in this.SendLine("HTTP/1.1 " + this.ResStatus + " Hello Happy World"))
 					yield return relay;
 
 				foreach (string[] pair in this.ResHeaderPairs)
@@ -935,28 +945,14 @@ namespace SimpleWebServer
 		public abstract class SockServer
 		{
 			/// <summary>
-			/// ポート番号
-			/// </summary>
-			public int PortNo = 80;
-
-			/// <summary>
 			/// 接続待ちキューの長さ
 			/// </summary>
-			public int Backlog = 300;
+			public static int Backlog = 300;
 
 			/// <summary>
 			/// 最大同時接続数
 			/// </summary>
-			public int ConnectMax = 100;
-
-			/// <summary>
-			/// 処理の合間に呼ばれる処理
-			/// 戻り値：
-			/// -- サーバーを継続するか
-			/// </summary>
-			public Func<bool> Interlude = () => !Console.KeyAvailable;
-
-			// <---- prm
+			public static int ConnectMax = 100;
 
 			/// <summary>
 			/// サーバーロジック
@@ -971,7 +967,7 @@ namespace SimpleWebServer
 
 			private List<SockChannel> Channels = new List<SockChannel>();
 
-			public void Perform()
+			public void Perform(int portNo, Func<bool> interlude)
 			{
 				WriteLog("サーバーを開始しています...");
 
@@ -979,24 +975,24 @@ namespace SimpleWebServer
 				{
 					using (Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
 					{
-						IPEndPoint endPoint = new IPEndPoint(0L, this.PortNo);
+						IPEndPoint endPoint = new IPEndPoint(0L, portNo);
 
 						listener.Bind(endPoint);
-						listener.Listen(this.Backlog);
+						listener.Listen(Backlog);
 						listener.Blocking = false;
 
 						WriteLog("サーバーを開始しました。");
 
 						int waitMillis = 0;
 
-						while (this.Interlude())
+						while (interlude())
 						{
 							if (waitMillis < 100)
 								waitMillis++;
 
 							for (int c = 0; c < 30; c++) // HACK: 繰り返し回数_適当
 							{
-								Socket handler = this.Channels.Count < this.ConnectMax ? this.Connect(listener) : null;
+								Socket handler = this.Channels.Count < ConnectMax ? this.Connect(listener) : null;
 
 								if (handler == null) // ? 接続無し || 最大同時接続数に達している。
 									break;
