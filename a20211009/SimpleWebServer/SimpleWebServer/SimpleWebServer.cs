@@ -83,7 +83,7 @@ namespace SimpleWebServer
 		/// </summary>
 		public static int ConnectMax = 100;
 
-		// 全体の設定ここまで
+		// 設定ここまで
 
 		public void Perform()
 		{
@@ -151,7 +151,7 @@ namespace SimpleWebServer
 					urlPath = urlPath.Substring(0, ques);
 			}
 
-			if (1000 < urlPath.Length) // ラフなしきい値
+			if (1000 < urlPath.Length) // rough limit
 				throw new Exception("Received path is too long");
 
 			WriteLog("URL-Path：" + urlPath);
@@ -171,10 +171,10 @@ namespace SimpleWebServer
 			else if (Directory.Exists(path))
 			{
 				channel.ResStatus = 301;
-				channel.ResHeaderPairs.Add(new string[] { "Location", "http://" + GetHeaderValue(channel, "Host") + "/" + string.Join("", pTkns.Select(v => EncodeUrl(v) + "/")) });
+				channel.ResHeaderPairs.Add(new string[] { "Location", $"http://{GetHeaderValue(channel, "Host")}/{string.Join("", pTkns.Select(v => EncodeUrl(v)))}/" });
 				//channel.ResBody = null;
 
-				goto endFunc;
+				goto response;
 			}
 			if (File.Exists(path))
 			{
@@ -189,7 +189,7 @@ namespace SimpleWebServer
 				//channel.ResBody = null;
 			}
 
-		endFunc:
+		response:
 			channel.ResHeaderPairs.Add(new string[] { "Server", "sws" });
 
 			if (head && channel.ResBody != null)
@@ -205,7 +205,7 @@ namespace SimpleWebServer
 			WriteLog("Res-Status: " + channel.ResStatus);
 
 			foreach (string[] pair in channel.ResHeaderPairs)
-				WriteLog("Res-Header: " + pair[0] + " = " + pair[1]);
+				WriteLog($"Res-Header: {pair[0]} = {pair[1]}");
 
 			WriteLog("Res-Body: " + (channel.ResBody != null));
 		}
@@ -240,7 +240,7 @@ namespace SimpleWebServer
 				int readSize = (int)Math.Min(fileSize - offset, 2000000L);
 				byte[] buff = new byte[readSize];
 
-				WriteLog("Read: " + offset + " " + readSize + " " + fileSize + " " + (offset * 100.0 / fileSize).ToString("F2") + " " + ((offset + readSize) * 100.0 / fileSize).ToString("F2"));
+				WriteLog($"Read: {offset} {readSize} {fileSize} {(offset * 100.0 / fileSize).ToString("F2")} {((offset + readSize) * 100.0 / fileSize).ToString("F2")}");
 
 				using (FileStream reader = new FileStream(file, FileMode.Open, FileAccess.Read))
 				{
@@ -564,7 +564,7 @@ namespace SimpleWebServer
 			public IEnumerable<int> RecvRequest()
 			{
 				this.Channel.SessionTimeoutTime = TimeoutMillisToDateTime(RequestTimeoutMillis);
-				this.Channel.IdleTimeoutMillis = FirstLineTimeoutMillis;
+				this.Channel.P_IdleTimeoutMillis = FirstLineTimeoutMillis;
 
 				foreach (int relay in this.RecvLine(ret => this.FirstLine = ret))
 					yield return relay;
@@ -577,7 +577,7 @@ namespace SimpleWebServer
 					this.HTTPVersion = tokens[2];
 				}
 
-				this.Channel.IdleTimeoutMillis = IdleTimeoutMillis;
+				this.Channel.P_IdleTimeoutMillis = IdleTimeoutMillis;
 
 				foreach (int relay in this.RecvHeader())
 					yield return relay;
@@ -736,7 +736,7 @@ namespace SimpleWebServer
 					string key = pair[0];
 					string value = pair[1];
 
-					if (1000 < key.Length || 1000 < value.Length) // ラフなしきい値
+					if (1000 < key.Length || 1000 < value.Length) // rough limit
 					{
 						WriteLog("Ignore gen-header key and value (too long)");
 						continue;
@@ -808,7 +808,7 @@ namespace SimpleWebServer
 							throw new Exception("Bad chunk-size: " + size);
 
 						if (BodySizeMax != -1 && BodySizeMax - buff.Count < size)
-							throw new Exception("Chunk is too big: " + buff.Count + " + " + size);
+							throw new Exception($"Chunk is too big: {buff.Count} + {size}");
 
 						int chunkEnd = buff.Count + size;
 
@@ -1097,7 +1097,7 @@ namespace SimpleWebServer
 
 									this.Channels.Add(channel);
 
-									WriteLog("通信開始 " + channel.ID);
+									WriteLog("CONN-ST " + channel.ID);
 								}
 							}
 							for (int index = this.Channels.Count - 1; 0 <= index; index--)
@@ -1122,7 +1122,7 @@ namespace SimpleWebServer
 
 								if (size == 0) // ? 切断
 								{
-									WriteLog("通信終了 " + channel.ID);
+									WriteLog("CONN-ED " + channel.ID);
 
 									this.Disconnect(channel);
 									this.Channels[index] = this.Channels[this.Channels.Count - 1];
@@ -1222,7 +1222,7 @@ namespace SimpleWebServer
 			/// 無通信タイムアウト_ミリ秒
 			/// -1 == INFINITE
 			/// </summary>
-			public int IdleTimeoutMillis = -1;
+			public int P_IdleTimeoutMillis = -1;
 
 			private IEnumerable<int> PreRecvSend()
 			{
@@ -1293,7 +1293,7 @@ namespace SimpleWebServer
 							throw new Exception("Receive error", e);
 						}
 					}
-					if (this.IdleTimeoutMillis != -1 && this.IdleTimeoutMillis < (DateTime.Now - startedTime).TotalMilliseconds)
+					if (this.P_IdleTimeoutMillis != -1 && this.P_IdleTimeoutMillis < (DateTime.Now - startedTime).TotalMilliseconds)
 					{
 						throw new Exception("Receive error (idle time-out)");
 					}
@@ -1351,7 +1351,7 @@ namespace SimpleWebServer
 							throw new Exception("Send error", e);
 						}
 					}
-					if (this.IdleTimeoutMillis != -1 && this.IdleTimeoutMillis < (DateTime.Now - startedTime).TotalMilliseconds)
+					if (this.P_IdleTimeoutMillis != -1 && this.P_IdleTimeoutMillis < (DateTime.Now - startedTime).TotalMilliseconds)
 					{
 						throw new Exception("Send error (idle time-out)");
 					}
@@ -1503,7 +1503,7 @@ namespace SimpleWebServer
 				else
 					TWCounters[TWCounterIndex] += twAdd;
 
-				WriteLog("TIME-WAIT-MONITOR: " + twAdd + ", " + ConnectedCount + " + " + TWCounters.Sum() + " = " + (ConnectedCount + TWCounters.Sum()));
+				WriteLog($"TIME-WAIT-MONITOR: {twAdd}, {ConnectedCount} + {TWCounters.Sum()} = {ConnectedCount + TWCounters.Sum()}");
 			}
 
 			private static DateTime GetNextRotateTime()
