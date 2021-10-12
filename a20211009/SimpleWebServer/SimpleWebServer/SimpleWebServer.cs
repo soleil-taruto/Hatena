@@ -27,7 +27,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 		/// 戻り値：
 		/// -- サーバーを継続するか
 		/// </summary>
-		public Func<bool> Interlude = () => !Console.KeyAvailable;
+		public Func<bool> Interlude = () => !Console.KeyAvailable; // 何かキーを押したらサーバー終了
 
 		// インスタンスの設定ここまで
 
@@ -2003,6 +2003,7 @@ eeefeefcfa40fa7efa80fafcfb40fb7efb80fbfcfc40fc4b
 
 			RANGES_RESOURCE = new string(RANGES_RESOURCE.Where(chr => ' ' <= chr).ToArray());
 
+			//Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // for .NET Core
 			Encoding SJIS = Encoding.GetEncoding(932);
 
 			for (int index = 0; index < RANGES_RESOURCE.Length; index += 8)
