@@ -85,27 +85,25 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 		// 設定ここまで
 
-		public static void Run(string[] args)
+		public static void Run(string docRoot, int portNo)
 		{
 			try
 			{
-				SimpleWebServer sws = new SimpleWebServer();
+				if (string.IsNullOrEmpty(docRoot))
+					throw new Exception("ドキュメントルートを指定して下さい。");
 
-				if (1 <= args.Length)
+				if (!Directory.Exists(docRoot))
+					throw new Exception("ドキュメントルートは存在しません：" + docRoot);
+
+				if (portNo < 1 || 65535 < portNo)
+					throw new Exception("不正なポート番号です：" + portNo);
+
+				new SimpleWebServer()
 				{
-					sws.DocRoot = args[0];
-
-					if (2 <= args.Length)
-						sws.PortNo = int.Parse(args[1]);
+					DocRoot = docRoot,
+					PortNo = portNo,
 				}
-
-				if (!Directory.Exists(sws.DocRoot))
-					throw new Exception("ドキュメントルートは存在しません：" + sws.DocRoot);
-
-				if (sws.PortNo < 1 || 65535 < sws.PortNo)
-					throw new Exception("不正なポート番号です：" + sws.PortNo);
-
-				sws.Perform();
+				.Perform();
 			}
 			catch (Exception e)
 			{

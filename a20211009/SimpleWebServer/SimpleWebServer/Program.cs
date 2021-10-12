@@ -6,8 +6,10 @@ namespace SimpleWebServer
 	{
 		static void Main(string[] args)
 		{
-#if !true
-			SimpleWebServer.Run(args);
+#if true
+			SimpleWebServer.Run(@"C:\temp", 80);
+#elif false
+			SimpleWebServer.Run(args); // old
 #else
 			new SimpleWebServer()
 			{
