@@ -197,7 +197,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 			else if (Directory.Exists(path))
 			{
 				channel.ResStatus = 301;
-				channel.ResHeaderPairs.Add(new string[] { "Location", $"http://{GetHeaderValue(channel, "Host")}/{string.Join("", pTkns.Select(v => EncodeUrl(v)))}/" });
+				channel.ResHeaderPairs.Add(new string[] { "Location", $"http://{channel.GetHeaderValue("Host")}/{string.Join("", pTkns.Select(v => EncodeUrl(v)))}/" });
 				//channel.ResBody = null;
 
 				goto response;
@@ -234,15 +234,6 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				WriteLog($"Res-Header: {pair[0]} = {pair[1]}");
 
 			WriteLog("Res-Body: " + (channel.ResBody != null));
-		}
-
-		private static string GetHeaderValue(HTTPServerChannel channel, string name)
-		{
-			foreach (string[] pair in channel.HeaderPairs)
-				if (EqualsIgnoreCase(pair[0], name))
-					return pair[1];
-
-			throw new Exception("No header key: " + name);
 		}
 
 		private static string EncodeUrl(string str)
@@ -729,9 +720,9 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 					if (HEADERS_LEN_MAX < roughHeaderLength)
 						throw new OverflowException("Received header is too long");
 
-					if (line[0] <= ' ')
+					if (line[0] <= ' ') // HACK: ライン・フォルディング対応 -- フォルディングは廃止されたっぽい？
 					{
-						this.HeaderPairs[this.HeaderPairs.Count - 1][1] += " " + line.Trim();
+						this.HeaderPairs[this.HeaderPairs.Count - 1][1] += line.Trim();
 					}
 					else
 					{
@@ -747,6 +738,16 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 						});
 					}
 				}
+			}
+
+			public string GetHeaderValue(string name)
+			{
+				string[] pair = this.HeaderPairs.FirstOrDefault(v => EqualsIgnoreCase(v[0], name));
+
+				if (pair == null)
+					throw new Exception("No header key: " + name);
+
+				return pair[1];
 			}
 
 			public int ContentLength = 0;
@@ -1008,13 +1009,25 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				// noop
 			}
 #else
-			private static long Counter = 0L;
+			private static string TMP_Dir = null;
 			private string BuffFile;
 			private int Size = 0;
 
 			public HTTPBodyOutputStream()
 			{
-				this.BuffFile = Path.Combine(@"C:\temp", (Counter++) + ".tmp");
+				if (TMP_Dir == null)
+				{
+					string dir = Environment.GetEnvironmentVariable("TMP");
+
+					if (string.IsNullOrEmpty(dir))
+						throw new Exception("TMP is empty");
+
+					if (!Directory.Exists(dir))
+						throw new Exception("TMP does not exists");
+
+					TMP_Dir = dir;
+				}
+				this.BuffFile = Path.Combine(TMP_Dir, $"SimpleWebServer_{Guid.NewGuid().ToString()}.tmp");
 				File.WriteAllBytes(this.BuffFile, new byte[0]);
 			}
 
@@ -1067,7 +1080,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 			/// <summary>
 			/// サーバーロジック
 			/// 通信量：
-			/// -- 0 == 通信終了 -- SCommon.Supplier の最後の要素の次以降 0 (default(int)) になるため
+			/// -- 0 == 通信終了 -- Supplier の最後の要素の次以降 0 (default(int)) になるため
 			/// -- 0 未満 == 通信無し
 			/// -- 1 以上 == 通信有り
 			/// </summary>
