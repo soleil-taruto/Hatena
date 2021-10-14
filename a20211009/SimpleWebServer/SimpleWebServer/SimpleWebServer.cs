@@ -733,8 +733,8 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 						this.HeaderPairs.Add(new string[]
 						{
-						line.Substring(0, colon).Trim(),
-						line.Substring(colon + 1).Trim(),
+							line.Substring(0, colon).Trim(),
+							line.Substring(colon + 1).Trim(),
 						});
 					}
 				}
