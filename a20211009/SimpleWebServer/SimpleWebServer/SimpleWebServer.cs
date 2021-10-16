@@ -1100,7 +1100,14 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 					{
 						IPEndPoint endPoint = new IPEndPoint(0L, portNo);
 
-						listener.Bind(endPoint);
+						try
+						{
+							listener.Bind(endPoint);
+						}
+						catch (Exception e)
+						{
+							throw new Exception("バインドに失敗しました。指定されたポート番号は使用中です。", e);
+						}
 						listener.Listen(Backlog);
 						listener.Blocking = false;
 
