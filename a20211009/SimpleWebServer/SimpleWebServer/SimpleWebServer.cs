@@ -1023,7 +1023,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 						throw new Exception("TMP is empty");
 
 					if (!Directory.Exists(dir))
-						throw new Exception("TMP does not exists");
+						throw new Exception("TMP does not exist");
 
 					TMP_Dir = dir;
 				}
