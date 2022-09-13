@@ -197,14 +197,14 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 			else if (Directory.Exists(path))
 			{
 				channel.ResStatus = 301;
-				channel.ResHeaderPairs.Add(new string[] { "Location", $"http://{channel.GetHeaderValue("Host")}/{string.Join("", pTkns.Select(v => EncodeUrl(v)))}/" });
-				//channel.ResBody = null;
+				channel.ResHeaderPairs.Add(new string[] { "Location", $"http://{channel.GetHeaderValue("Host")}/{string.Join("/", pTkns.Select(v => EncodeUrl(v)))}/" });
+				channel.ResBody = null;
 
 				goto response;
 			}
 			if (File.Exists(path))
 			{
-				//channel.ResStatus = 200;
+				channel.ResStatus = 200;
 				channel.ResHeaderPairs.Add(new string[] { "Content-Type", ContentTypeCollection.I.GetContentType(Path.GetExtension(path)) });
 				channel.ResBody = E_ReadFile(path);
 			}
@@ -212,7 +212,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 			{
 				channel.ResStatus = 404;
 				//channel.ResHeaderPairs.Add();
-				//channel.ResBody = null;
+				channel.ResBody = null;
 			}
 
 		response:
