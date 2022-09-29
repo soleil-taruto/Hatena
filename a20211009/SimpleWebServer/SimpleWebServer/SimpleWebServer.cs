@@ -1561,7 +1561,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 		#region ToFairLocalPath
 
 		/// <summary>
-		/// Windowsのローカル名に使用出来ない予約名のリストを返す。
+		/// Windowsのローカル名に使用できない予約名のリストを返す。
 		/// 今では使用可能なものも含む。
 		/// 元にしたコード：
 		/// https://github.com/stackprobe/Factory/blob/master/Common/DataConv.c#L460-L491
