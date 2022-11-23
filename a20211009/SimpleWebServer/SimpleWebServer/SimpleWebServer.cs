@@ -583,7 +583,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				this.Channel.SessionTimeoutTime = TimeoutMillisToDateTime(RequestTimeoutMillis);
 				this.Channel.P_IdleTimeoutMillis = FirstLineTimeoutMillis;
 
-				foreach (int relay in this.RecvLine(ret => this.FirstLine = ret))
+				foreach (var relay in this.RecvLine(ret => this.FirstLine = ret))
 					yield return relay;
 
 				{
@@ -596,18 +596,18 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 				this.Channel.P_IdleTimeoutMillis = IdleTimeoutMillis;
 
-				foreach (int relay in this.RecvHeader())
+				foreach (var relay in this.RecvHeader())
 					yield return relay;
 
 				this.CheckHeader();
 
 				if (this.Expect100Continue)
 				{
-					foreach (int relay in this.SendLine("HTTP/1.1 100 Continue")
+					foreach (var relay in this.SendLine("HTTP/1.1 100 Continue")
 						.Concat(this.Channel.Send(CRLF)))
 						yield return relay;
 				}
-				foreach (int relay in this.RecvBody())
+				foreach (var relay in this.RecvBody())
 					yield return relay;
 			}
 
@@ -673,7 +673,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				{
 					byte[] chrs = null;
 
-					foreach (int relay in this.Channel.Recv(1, ret => chrs = ret))
+					foreach (var relay in this.Channel.Recv(1, ret => chrs = ret))
 						yield return relay;
 
 					byte chr = chrs[0];
@@ -706,7 +706,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				{
 					string line = null;
 
-					foreach (int relay in this.RecvLine(ret => line = ret))
+					foreach (var relay in this.RecvLine(ret => line = ret))
 						yield return relay;
 
 					if (line == null)
@@ -720,9 +720,9 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 					if (HEADERS_LEN_MAX < roughHeaderLength)
 						throw new OverflowException("Received header is too long");
 
-					if (line[0] <= ' ') // HACK: ライン・フォルディング対応 -- フォルディングは廃止されたっぽい？
+					if (line[0] <= ' ') // HACK: 行折り畳み(line folding)対応 -- 行折り畳みは廃止されたっぽいけど念のため対応しておく。
 					{
-						this.HeaderPairs[this.HeaderPairs.Count - 1][1] += line.Trim();
+						this.HeaderPairs[this.HeaderPairs.Count - 1][1] += " " + line.Trim();
 					}
 					else
 					{
@@ -807,7 +807,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 					{
 						string line = null;
 
-						foreach (int relay in this.RecvLine(ret => line = ret))
+						foreach (var relay in this.RecvLine(ret => line = ret))
 							yield return relay;
 
 						if (line == null)
@@ -843,7 +843,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 						{
 							byte[] data = null;
 
-							foreach (int relay in this.Channel.Recv(Math.Min(READ_SIZE_MAX, chunkEnd - buff.Count), ret => data = ret))
+							foreach (var relay in this.Channel.Recv(Math.Min(READ_SIZE_MAX, chunkEnd - buff.Count), ret => data = ret))
 								yield return relay;
 
 							if (data == null)
@@ -851,7 +851,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 							buff.Write(data);
 						}
-						foreach (int relay in this.Channel.Recv(2, ret => { })) // CR-LF
+						foreach (var relay in this.Channel.Recv(2, ret => { })) // CR-LF
 							yield return relay;
 					}
 
@@ -859,7 +859,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 					{
 						string line = null;
 
-						foreach (int relay in this.RecvLine(ret => line = ret))
+						foreach (var relay in this.RecvLine(ret => line = ret))
 							yield return relay;
 
 						if (line == null)
@@ -881,7 +881,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 					{
 						byte[] data = null;
 
-						foreach (int relay in this.Channel.Recv(Math.Min(READ_SIZE_MAX, this.ContentLength - buff.Count), ret => data = ret))
+						foreach (var relay in this.Channel.Recv(Math.Min(READ_SIZE_MAX, this.ContentLength - buff.Count), ret => data = ret))
 							yield return relay;
 
 						if (data == null)
@@ -902,16 +902,16 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				this.Body = null;
 				this.Channel.SessionTimeoutTime = TimeoutMillisToDateTime(ResponseTimeoutMillis);
 
-				foreach (int relay in this.SendLine("HTTP/1.1 " + this.ResStatus + " Hello Happy World"))
+				foreach (var relay in this.SendLine("HTTP/1.1 " + this.ResStatus + " Hello Happy World"))
 					yield return relay;
 
 				foreach (string[] pair in this.ResHeaderPairs)
-					foreach (int relay in this.SendLine(pair[0] + ": " + pair[1]))
+					foreach (var relay in this.SendLine(pair[0] + ": " + pair[1]))
 						yield return relay;
 
 				if (this.ResBody == null)
 				{
-					foreach (int relay in this.EndHeader())
+					foreach (var relay in this.EndHeader())
 						yield return relay;
 				}
 				else
@@ -924,25 +924,25 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 						if (resBodyIterator.MoveNext())
 						{
-							foreach (int relay in this.SendLine("Transfer-Encoding: chunked")
+							foreach (var relay in this.SendLine("Transfer-Encoding: chunked")
 								.Concat(this.EndHeader())
 								.Concat(this.SendChunk(first)))
 								yield return relay;
 
 							do
 							{
-								foreach (int relay in this.SendChunk(resBodyIterator.Current))
+								foreach (var relay in this.SendChunk(resBodyIterator.Current))
 									yield return relay;
 							}
 							while (resBodyIterator.MoveNext());
 
-							foreach (int relay in this.SendLine("0")
+							foreach (var relay in this.SendLine("0")
 								.Concat(this.Channel.Send(CRLF)))
 								yield return relay;
 						}
 						else
 						{
-							foreach (int relay in this.SendLine("Content-Length: " + first.Length)
+							foreach (var relay in this.SendLine("Content-Length: " + first.Length)
 								.Concat(this.EndHeader())
 								.Concat(this.Channel.Send(first)))
 								yield return relay;
@@ -950,7 +950,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 					}
 					else
 					{
-						foreach (int relay in this.SendLine("Content-Length: 0")
+						foreach (var relay in this.SendLine("Content-Length: 0")
 							.Concat(this.EndHeader()))
 							yield return relay;
 					}
@@ -959,7 +959,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 			private IEnumerable<int> EndHeader()
 			{
-				foreach (int relay in this.SendLine("Connection: " + (this.KeepAlive ? "keep-alive" : "close"))
+				foreach (var relay in this.SendLine("Connection: " + (this.KeepAlive ? "keep-alive" : "close"))
 					.Concat(this.Channel.Send(CRLF)))
 					yield return relay;
 			}
@@ -968,7 +968,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 			{
 				if (1 <= chunk.Length)
 				{
-					foreach (int relay in this.SendLine(chunk.Length.ToString("x"))
+					foreach (var relay in this.SendLine(chunk.Length.ToString("x"))
 						.Concat(this.Channel.Send(chunk))
 						.Concat(this.Channel.Send(CRLF)))
 						yield return relay;
@@ -977,7 +977,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 			private IEnumerable<int> SendLine(string line)
 			{
-				foreach (int relay in this.Channel.Send(Encoding.ASCII.GetBytes(line))
+				foreach (var relay in this.Channel.Send(Encoding.ASCII.GetBytes(line))
 					.Concat(this.Channel.Send(CRLF)))
 					yield return relay;
 			}
@@ -1299,7 +1299,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				{
 					int? recvSize = null;
 
-					foreach (int relay in this.TryRecv(data, offset, size, ret => recvSize = ret))
+					foreach (var relay in this.TryRecv(data, offset, size, ret => recvSize = ret))
 						yield return relay;
 
 					size -= recvSize.Value;
@@ -1314,7 +1314,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 				for (; ; )
 				{
-					foreach (int relay in this.PreRecvSend())
+					foreach (var relay in this.PreRecvSend())
 						yield return relay;
 
 					try
@@ -1358,7 +1358,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 				{
 					int? sentSize = null;
 
-					foreach (int relay in this.TrySend(data, offset, Math.Min(4 * 1024 * 1024, size), ret => sentSize = ret))
+					foreach (var relay in this.TrySend(data, offset, Math.Min(4 * 1024 * 1024, size), ret => sentSize = ret))
 						yield return relay;
 
 					size -= sentSize.Value;
@@ -1372,7 +1372,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 				for (; ; )
 				{
-					foreach (int relay in this.PreRecvSend())
+					foreach (var relay in this.PreRecvSend())
 						yield return relay;
 
 					try
