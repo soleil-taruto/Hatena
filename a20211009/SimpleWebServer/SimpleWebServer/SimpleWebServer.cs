@@ -254,7 +254,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 			for (long offset = 0L; offset < fileSize;)
 			{
-				int readSize = (int)Math.Min(fileSize - offset, 2000000L);
+				int readSize = (int)Math.Min(fileSize - offset, (long)(512 * 1024));
 				byte[] buff = new byte[readSize];
 
 				WriteLog($"Read: {offset} {readSize} {fileSize} {(offset * 100.0 / fileSize).ToString("F2")} {((offset + readSize) * 100.0 / fileSize).ToString("F2")}");
@@ -665,7 +665,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 			private IEnumerable<int> RecvLine(Action<string> a_return)
 			{
-				const int LINE_LEN_MAX = 512000;
+				const int LINE_LEN_MAX = 128 * 1024;
 
 				List<byte> buff = new List<byte>(LINE_LEN_MAX);
 
@@ -697,8 +697,8 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 			private IEnumerable<int> RecvHeader()
 			{
-				const int HEADERS_LEN_MAX = 612000;
-				const int WEIGHT = 1000;
+				const int HEADERS_LEN_MAX = 128 * 1024 + 65536;
+				const int WEIGHT = 256;
 
 				int roughHeaderLength = 0;
 
@@ -797,7 +797,7 @@ namespace SimpleWebServer // ★名前空間は適宜変えて下さい。
 
 			private IEnumerable<int> RecvBody()
 			{
-				const int READ_SIZE_MAX = 2000000;
+				const int READ_SIZE_MAX = 1024 * 1024;
 
 				HTTPBodyOutputStream buff = this.Channel.BodyOutputStream;
 
